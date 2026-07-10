@@ -42,9 +42,14 @@ function QrCodes() {
         title="QR codes dos quartos"
         subtitle="Imprima e cole um QR em cada quarto. O hóspede lê e avalia a estadia — o número do quarto já vem preenchido."
         action={
-          <button onClick={() => window.print()} className="btn-primary flex items-center gap-1.5 no-print">
-            <Printer className="h-4 w-4" /> Imprimir folha
-          </button>
+          <div className="flex gap-2 no-print">
+            <a href="/imprimir" target="_blank" rel="noreferrer" className="btn-ghost flex items-center gap-1.5">
+              Formulário em papel
+            </a>
+            <button onClick={() => window.print()} className="btn-primary flex items-center gap-1.5">
+              <Printer className="h-4 w-4" /> Imprimir folha
+            </button>
+          </div>
         }
       />
 
