@@ -124,4 +124,57 @@
     font-weight: 700;
     letter-spacing: 0.2px;
   }
+  .field {
+    width: 100%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-input);
+    background-color: var(--color-card);
+    padding: 0.55rem 0.7rem;
+    font-size: 0.9rem;
+    color: var(--color-foreground);
+    outline: none;
+  }
+  .field:focus {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px var(--brass-bg);
+  }
+  .btn-primary {
+    border-radius: var(--radius-md);
+    background-color: var(--color-pine);
+    color: var(--color-primary-foreground);
+    font-weight: 600;
+    padding: 0.5rem 0.9rem;
+    transition: background-color 0.15s;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-pine-dark);
+  }
+  .btn-ghost {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-card);
+    font-weight: 600;
+    padding: 0.5rem 0.9rem;
+    transition: background-color 0.15s;
+  }
+  .btn-ghost:hover {
+    background-color: var(--color-muted);
+  }
+  .stat-card {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.1rem;
+    box-shadow: 0 1px 2px rgba(42, 33, 24, 0.06);
+  }
 }
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+}
+
