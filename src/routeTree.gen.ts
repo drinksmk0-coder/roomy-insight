@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedReservasRouteImport } from './routes/_authenticated/reservas'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
+import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -45,10 +46,16 @@ const AuthenticatedMapaRoute = AuthenticatedMapaRouteImport.update({
   path: '/mapa',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/clientes': typeof AuthenticatedClientesRoute
   '/mapa': typeof AuthenticatedMapaRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/reservas': typeof AuthenticatedReservasRoute
@@ -56,6 +63,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/clientes': typeof AuthenticatedClientesRoute
   '/mapa': typeof AuthenticatedMapaRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/reservas': typeof AuthenticatedReservasRoute
@@ -65,20 +73,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/mapa': typeof AuthenticatedMapaRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/reservas': typeof AuthenticatedReservasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/mapa' | '/painel' | '/reservas'
+  fullPaths: '/' | '/auth' | '/clientes' | '/mapa' | '/painel' | '/reservas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/mapa' | '/painel' | '/reservas'
+  to: '/' | '/auth' | '/clientes' | '/mapa' | '/painel' | '/reservas'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/clientes'
     | '/_authenticated/mapa'
     | '/_authenticated/painel'
     | '/_authenticated/reservas'
@@ -134,16 +144,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/clientes': {
+      id: '/_authenticated/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof AuthenticatedClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedMapaRoute: typeof AuthenticatedMapaRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedReservasRoute: typeof AuthenticatedReservasRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedMapaRoute: AuthenticatedMapaRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedReservasRoute: AuthenticatedReservasRoute,
