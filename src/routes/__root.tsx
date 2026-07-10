@@ -89,10 +89,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Pousada Real Cruzília — Painel de Operação" },
       {
         property: "og:description",
-        content: "Gestão completa da pousada: reservas, quartos, vendas e avaliações.",
+        content: "Sistema de gestão da Pousada Real Cruzília: reservas, quartos, vendas, reclamações e avaliações de hóspedes por QR code.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Pousada Real Cruzília — Painel de Operação" },
+      { name: "twitter:description", content: "Sistema de gestão da Pousada Real Cruzília: reservas, quartos, vendas, reclamações e avaliações de hóspedes por QR code." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/7cdf396a-8e93-4ff7-8a32-d0bdfe4742f6" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/7cdf396a-8e93-4ff7-8a32-d0bdfe4742f6" },
     ],
     links: [
       {
