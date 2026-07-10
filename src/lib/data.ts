@@ -110,10 +110,8 @@ export function useUpdate<T extends TableName>(table: T, invalidate: string[]) {
   return useMutation({
     mutationFn: async ({ id, patch }: { id: string | number; patch: TablesUpdate<T> }) => {
       const key = table === "rooms" ? "numero" : "id";
-      const { error } = await supabase
-        .from(table)
-        .update(patch as never)
-        .eq(key, id as never);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from(table) as any).update(patch).eq(key, id);
       if (error) throw error;
     },
     onSuccess: () => invalidate.forEach((k) => qc.invalidateQueries({ queryKey: [k] })),
@@ -125,7 +123,8 @@ export function useDelete(table: TableName, invalidate: string[]) {
   return useMutation({
     mutationFn: async (id: string | number) => {
       const key = table === "rooms" ? "numero" : "id";
-      const { error } = await supabase.from(table).delete().eq(key, id as never);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from(table) as any).delete().eq(key, id);
       if (error) throw error;
     },
     onSuccess: () => invalidate.forEach((k) => qc.invalidateQueries({ queryKey: [k] })),
