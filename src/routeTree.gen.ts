@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVendasRouteImport } from './routes/_authenticated/vendas'
 import { Route as AuthenticatedReservasRouteImport } from './routes/_authenticated/reservas'
+import { Route as AuthenticatedReclamacoesRouteImport } from './routes/_authenticated/reclamacoes'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
@@ -42,6 +43,12 @@ const AuthenticatedReservasRoute = AuthenticatedReservasRouteImport.update({
   path: '/reservas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReclamacoesRoute =
+  AuthenticatedReclamacoesRouteImport.update({
+    id: '/reclamacoes',
+    path: '/reclamacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/clientes': typeof AuthenticatedClientesRoute
   '/mapa': typeof AuthenticatedMapaRoute
   '/painel': typeof AuthenticatedPainelRoute
+  '/reclamacoes': typeof AuthenticatedReclamacoesRoute
   '/reservas': typeof AuthenticatedReservasRoute
   '/vendas': typeof AuthenticatedVendasRoute
 }
@@ -73,6 +81,7 @@ export interface FileRoutesByTo {
   '/clientes': typeof AuthenticatedClientesRoute
   '/mapa': typeof AuthenticatedMapaRoute
   '/painel': typeof AuthenticatedPainelRoute
+  '/reclamacoes': typeof AuthenticatedReclamacoesRoute
   '/reservas': typeof AuthenticatedReservasRoute
   '/vendas': typeof AuthenticatedVendasRoute
 }
@@ -84,6 +93,7 @@ export interface FileRoutesById {
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/mapa': typeof AuthenticatedMapaRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/reclamacoes': typeof AuthenticatedReclamacoesRoute
   '/_authenticated/reservas': typeof AuthenticatedReservasRoute
   '/_authenticated/vendas': typeof AuthenticatedVendasRoute
 }
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/mapa'
     | '/painel'
+    | '/reclamacoes'
     | '/reservas'
     | '/vendas'
   fileRoutesByTo: FileRoutesByTo
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/mapa'
     | '/painel'
+    | '/reclamacoes'
     | '/reservas'
     | '/vendas'
   id:
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
     | '/_authenticated/clientes'
     | '/_authenticated/mapa'
     | '/_authenticated/painel'
+    | '/_authenticated/reclamacoes'
     | '/_authenticated/reservas'
     | '/_authenticated/vendas'
   fileRoutesById: FileRoutesById
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReservasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reclamacoes': {
+      id: '/_authenticated/reclamacoes'
+      path: '/reclamacoes'
+      fullPath: '/reclamacoes'
+      preLoaderRoute: typeof AuthenticatedReclamacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
@@ -189,6 +209,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedMapaRoute: typeof AuthenticatedMapaRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedReclamacoesRoute: typeof AuthenticatedReclamacoesRoute
   AuthenticatedReservasRoute: typeof AuthenticatedReservasRoute
   AuthenticatedVendasRoute: typeof AuthenticatedVendasRoute
 }
@@ -197,6 +218,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedMapaRoute: AuthenticatedMapaRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedReclamacoesRoute: AuthenticatedReclamacoesRoute,
   AuthenticatedReservasRoute: AuthenticatedReservasRoute,
   AuthenticatedVendasRoute: AuthenticatedVendasRoute,
 }

@@ -159,8 +159,8 @@ function ComplaintForm({
   }) => void;
 }) {
   const [quarto, setQuarto] = useState<string>(rooms?.[0] ? String(rooms[0].numero) : "");
-  const [categoria, setCategoria] = useState(COMPLAINT_CATEGORIES[0].value);
-  const [gravidade, setGravidade] = useState(COMPLAINT_SEVERITY[1].value);
+  const [categoria, setCategoria] = useState<string>(COMPLAINT_CATEGORIES[0].value);
+  const [gravidade, setGravidade] = useState<string>(COMPLAINT_SEVERITY[1].value);
   const [descricao, setDescricao] = useState("");
   const [dispositivo, setDispositivo] = useState("");
   const [hospede, setHospede] = useState("");
