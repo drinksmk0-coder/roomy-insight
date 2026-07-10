@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ImprimirRouteImport } from './routes/imprimir'
 import { Route as AvaliarRouteImport } from './routes/avaliar'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -23,6 +24,11 @@ import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedAvaliacoesRouteImport } from './routes/_authenticated/avaliacoes'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ImprimirRoute = ImprimirRouteImport.update({
   id: '/imprimir',
   path: '/imprimir',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/avaliar': typeof AvaliarRoute
   '/imprimir': typeof ImprimirRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/avaliacoes': typeof AuthenticatedAvaliacoesRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/mapa': typeof AuthenticatedMapaRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/avaliar': typeof AvaliarRoute
   '/imprimir': typeof ImprimirRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/avaliacoes': typeof AuthenticatedAvaliacoesRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/mapa': typeof AuthenticatedMapaRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/avaliar': typeof AvaliarRoute
   '/imprimir': typeof ImprimirRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/avaliacoes': typeof AuthenticatedAvaliacoesRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/mapa': typeof AuthenticatedMapaRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/avaliar'
     | '/imprimir'
+    | '/sitemap.xml'
     | '/avaliacoes'
     | '/clientes'
     | '/mapa'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/avaliar'
     | '/imprimir'
+    | '/sitemap.xml'
     | '/avaliacoes'
     | '/clientes'
     | '/mapa'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/avaliar'
     | '/imprimir'
+    | '/sitemap.xml'
     | '/_authenticated/avaliacoes'
     | '/_authenticated/clientes'
     | '/_authenticated/mapa'
@@ -185,10 +197,18 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   AvaliarRoute: typeof AvaliarRoute
   ImprimirRoute: typeof ImprimirRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/imprimir': {
       id: '/imprimir'
       path: '/imprimir'
@@ -314,7 +334,18 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   AvaliarRoute: AvaliarRoute,
   ImprimirRoute: ImprimirRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
