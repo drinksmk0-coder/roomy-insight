@@ -21,14 +21,17 @@ function Reclamacoes() {
   const update = useUpdate("complaints", ["complaints"]);
   const [open, setOpen] = useState(false);
   const [cat, setCat] = useState("todas");
-  const [showResolved, setShowResolved] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("abertas");
 
   const filtered = useMemo(
     () =>
-      complaints.filter(
-        (c) => (cat === "todas" || c.categoria === cat) && (showResolved || c.status !== "resolvido"),
-      ),
-    [complaints, cat, showResolved],
+      complaints.filter((c) => {
+        if (cat !== "todas" && c.categoria !== cat) return false;
+        if (statusFilter === "abertas") return c.status !== "resolvido";
+        if (statusFilter === "todas") return true;
+        return c.status === statusFilter;
+      }),
+    [complaints, cat, statusFilter],
   );
 
   function exportCSV() {
