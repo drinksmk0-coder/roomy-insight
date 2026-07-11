@@ -151,6 +151,40 @@ export function activeReservationForRoom(reservations: Reservation[], numero: nu
   return active[0] ?? null;
 }
 
+// Future / upcoming reservations for a room (checkout still ahead), so the desk
+// can see a room is already booked before creating a new one.
+export function futureReservationsForRoom(
+  reservations: Reservation[],
+  numero: number,
+  today: string,
+): Reservation[] {
+  return reservations
+    .filter(
+      (r) =>
+        r.quarto === numero &&
+        r.status !== "cancelado" &&
+        r.status !== "finalizado" &&
+        r.checkout >= today,
+    )
+    .sort((a, b) => a.checkin.localeCompare(b.checkin));
+}
+
+// Derive the reservation status from how much was paid:
+// full payment -> ocupado, partial/none -> reservado.
+export function statusFromPayment(valorTotal: number, valorPago: number): "ocupado" | "reservado" {
+  return valorTotal > 0 && valorPago >= valorTotal ? "ocupado" : "reservado";
+}
+
+// An open, serious complaint blocks new guests from being placed in a room.
+export function roomBlock(complaints: Complaint[], numero: number): Complaint | null {
+  return (
+    complaints.find(
+      (c) => c.quarto === numero && c.gravidade === "alta" && c.status !== "resolvido",
+    ) ?? null
+  );
+}
+
+
 export function hasPaidOverlap(
   reservations: Reservation[],
   numero: number,
