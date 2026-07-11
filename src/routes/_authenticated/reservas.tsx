@@ -1,20 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Download } from "lucide-react";
+import { Plus, Download, Pencil, ArrowLeftRight } from "lucide-react";
 import {
   useRooms,
   useClients,
   useReservations,
+  useComplaints,
   useInsert,
   useUpdate,
+  statusFromPayment,
   hasPaidOverlap,
+  roomBlock,
   type Reservation,
 } from "@/lib/data";
-import { fmtBRL, fmtDate, todayISO, nightsBetween, downloadCSV } from "@/lib/format";
-import { PAYMENT_METHODS, RESERVATION_STATUS } from "@/lib/constants";
+import { fmtBRL, fmtDate, todayISO, downloadCSV } from "@/lib/format";
+import { ROOM_BLOCK_REASONS, complaintLabel } from "@/lib/constants";
 import { PageHeader } from "@/components/AppLayout";
 import { Modal, Field, Badge, EmptyState } from "@/components/ui-kit";
+import { ReservaForm, type ReservaRow } from "@/components/ReservaForm";
 
 export const Route = createFileRoute("/_authenticated/reservas")({
   component: Reservas,
@@ -32,9 +36,13 @@ function Reservas() {
   const { data: rooms = [] } = useRooms();
   const { data: clients = [] } = useClients();
   const { data: reservations = [] } = useReservations();
+  const { data: complaints = [] } = useComplaints();
   const insert = useInsert("reservations", ["reservations"]);
+  const insertComplaint = useInsert("complaints", ["complaints"]);
   const update = useUpdate("reservations", ["reservations"]);
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Reservation | null>(null);
+  const [moving, setMoving] = useState<Reservation | null>(null);
   const [filter, setFilter] = useState("ativas");
 
   const filtered = useMemo(() => {
@@ -46,7 +54,7 @@ function Reservas() {
 
   function exportCSV() {
     const rows: (string | number | null)[][] = [
-      ["Quarto", "Cliente", "Check-in", "Check-out", "Diárias", "Total", "Pagamento", "Pago", "Status"],
+      ["Quarto", "Cliente", "Check-in", "Check-out", "Diárias", "Total", "Pago", "Pagamento", "Status"],
       ...reservations.map((r) => [
         r.quarto,
         r.cliente_nome,
@@ -54,8 +62,8 @@ function Reservas() {
         r.checkout,
         r.diarias,
         r.valor_total,
+        r.valor_pago,
         r.pagamento,
-        r.pago ? "sim" : "não",
         r.status,
       ]),
     ];
@@ -66,7 +74,7 @@ function Reservas() {
     <div>
       <PageHeader
         title="Reservas"
-        subtitle="Cada quarto só aceita uma reserva ativa por período — o sistema bloqueia sobreposição."
+        subtitle="Pagou o total → quarto ocupado. Pagou o sinal → reservado. O sistema bloqueia sobreposição de datas."
         action={
           <div className="flex gap-2">
             <button onClick={exportCSV} className="btn-ghost flex items-center gap-1.5">
@@ -101,8 +109,7 @@ function Reservas() {
                 <th className="p-3">Quarto</th>
                 <th className="p-3">Cliente</th>
                 <th className="p-3">Período</th>
-                <th className="p-3">Total</th>
-                <th className="p-3">Pgto</th>
+                <th className="p-3">Pago / Total</th>
                 <th className="p-3">Status</th>
                 <th className="p-3"></th>
               </tr>
@@ -115,15 +122,22 @@ function Reservas() {
                   <td className="p-3 text-muted-foreground">
                     {fmtDate(r.checkin)} → {fmtDate(r.checkout)}
                   </td>
-                  <td className="p-3">{fmtBRL(r.valor_total)}</td>
                   <td className="p-3">
-                    <Badge tone={r.pago ? "sage" : "brick"}>{r.pago ? "pago" : r.pagamento}</Badge>
+                    <div>{fmtBRL(r.valor_pago)} / {fmtBRL(r.valor_total)}</div>
+                    <Badge tone={r.pago ? "sage" : "brass"}>
+                      {r.pago ? "quitado" : Number(r.valor_pago) > 0 ? "sinal pago" : "a receber"}
+                    </Badge>
                   </td>
                   <td className="p-3">
                     <Badge tone={statusTone[r.status]}>{r.status}</Badge>
                   </td>
                   <td className="p-3 text-right">
-                    <RowActions reservation={r} update={update} />
+                    <RowActions
+                      reservation={r}
+                      update={update}
+                      onEdit={() => setEditing(r)}
+                      onMove={() => setMoving(r)}
+                    />
                   </td>
                 </tr>
               ))}
@@ -132,20 +146,70 @@ function Reservas() {
         </div>
       )}
 
-      {open && (
+      {(open || editing) && (
         <ReservaForm
           rooms={rooms}
           clients={clients}
           reservations={reservations}
-          onClose={() => setOpen(false)}
+          complaints={complaints}
+          editing={editing}
+          onClose={() => {
+            setOpen(false);
+            setEditing(null);
+          }}
           onSave={(row) => {
-            insert.mutate(row, {
-              onSuccess: () => {
-                toast.success("Reserva criada");
-                setOpen(false);
+            if (editing) {
+              update.mutate(
+                { id: editing.id, patch: row },
+                {
+                  onSuccess: () => {
+                    toast.success("Reserva atualizada");
+                    setEditing(null);
+                  },
+                  onError: (e) => toast.error(e.message),
+                },
+              );
+            } else {
+              insert.mutate(row as never, {
+                onSuccess: () => {
+                  toast.success("Reserva criada");
+                  setOpen(false);
+                },
+                onError: (e) => toast.error(e.message),
+              });
+            }
+          }}
+        />
+      )}
+
+      {moving && (
+        <MoveRoomModal
+          reservation={moving}
+          rooms={rooms}
+          reservations={reservations}
+          complaints={complaints}
+          onClose={() => setMoving(null)}
+          onConfirm={(newRoom, reason, desc) => {
+            update.mutate(
+              { id: moving.id, patch: { quarto: newRoom } },
+              {
+                onSuccess: () => {
+                  if (reason) {
+                    insertComplaint.mutate({
+                      quarto: moving.quarto,
+                      categoria: reason,
+                      gravidade: "alta",
+                      descricao: desc || null,
+                      origem: "recepcao",
+                      status: "aberto",
+                    } as never);
+                  }
+                  toast.success(`Hóspede movido para o quarto ${newRoom}`);
+                  setMoving(null);
+                },
+                onError: (e) => toast.error(e.message),
               },
-              onError: (e) => toast.error(e.message),
-            });
+            );
           }}
         />
       )}
@@ -153,22 +217,61 @@ function Reservas() {
   );
 }
 
-function RowActions({ reservation, update }: { reservation: Reservation; update: ReturnType<typeof useUpdate> }) {
+function RowActions({
+  reservation,
+  update,
+  onEdit,
+  onMove,
+}: {
+  reservation: Reservation;
+  update: ReturnType<typeof useUpdate>;
+  onEdit: () => void;
+  onMove: () => void;
+}) {
   const done = ["finalizado", "cancelado"].includes(reservation.status);
+  const total = Number(reservation.valor_total);
   return (
-    <div className="flex justify-end gap-1.5">
-      {!reservation.pago && !done && (
-        <button
-          className="rounded-md bg-sage-bg px-2 py-1 text-xs font-semibold text-pine-dark"
-          onClick={() => update.mutate({ id: reservation.id, patch: { pago: true } })}
-        >
-          Marcar pago
-        </button>
+    <div className="flex flex-wrap justify-end gap-1.5">
+      {!done && !reservation.pago && (
+        <>
+          <button
+            className="rounded-md bg-brass-bg px-2 py-1 text-xs font-semibold text-[oklch(0.4_0.06_74)]"
+            onClick={() =>
+              update.mutate({
+                id: reservation.id,
+                patch: { valor_pago: Math.round((total / 2) * 100) / 100, status: "reservado" },
+              })
+            }
+          >
+            Sinal
+          </button>
+          <button
+            className="rounded-md bg-sage-bg px-2 py-1 text-xs font-semibold text-pine-dark"
+            onClick={() =>
+              update.mutate({
+                id: reservation.id,
+                patch: {
+                  valor_pago: total,
+                  pago: true,
+                  status: "ocupado",
+                  checkin_at: reservation.checkin_at ?? new Date().toISOString(),
+                },
+              })
+            }
+          >
+            Pagar total
+          </button>
+        </>
       )}
       {reservation.status === "reservado" && (
         <button
           className="rounded-md bg-brick-bg px-2 py-1 text-xs font-semibold text-brick"
-          onClick={() => update.mutate({ id: reservation.id, patch: { status: "ocupado" } })}
+          onClick={() =>
+            update.mutate({
+              id: reservation.id,
+              patch: { status: "ocupado", checkin_at: reservation.checkin_at ?? new Date().toISOString() },
+            })
+          }
         >
           Check-in
         </button>
@@ -181,164 +284,129 @@ function RowActions({ reservation, update }: { reservation: Reservation; update:
           Check-out
         </button>
       )}
+      {!done && (
+        <button
+          className="rounded-md bg-muted px-2 py-1 text-xs font-semibold text-muted-foreground"
+          onClick={onMove}
+          title="Trocar de quarto"
+        >
+          <ArrowLeftRight className="h-3.5 w-3.5" />
+        </button>
+      )}
+      <button
+        className="rounded-md bg-muted px-2 py-1 text-xs font-semibold text-muted-foreground"
+        onClick={onEdit}
+        title="Editar"
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }
 
-function ReservaForm({
+function MoveRoomModal({
+  reservation,
   rooms,
-  clients,
   reservations,
+  complaints,
   onClose,
-  onSave,
+  onConfirm,
 }: {
+  reservation: Reservation;
   rooms: ReturnType<typeof useRooms>["data"];
-  clients: ReturnType<typeof useClients>["data"];
   reservations: Reservation[];
+  complaints: ReturnType<typeof useComplaints>["data"];
   onClose: () => void;
-  onSave: (row: {
-    quarto: number;
-    cliente_id: string | null;
-    cliente_nome: string;
-    checkin: string;
-    checkout: string;
-    diarias: number;
-    valor_diaria: number;
-    valor_total: number;
-    pagamento: string;
-    pago: boolean;
-    status: string;
-  }) => void;
+  onConfirm: (newRoom: number, reason: string | null, desc: string) => void;
 }) {
-  const [quarto, setQuarto] = useState<number>(rooms?.[0]?.numero ?? 0);
-  const [clienteId, setClienteId] = useState("");
-  const [nome, setNome] = useState("");
-  const [checkin, setCheckin] = useState(todayISO());
-  const [checkout, setCheckout] = useState("");
-  const [valorDiaria, setValorDiaria] = useState<number>(rooms?.[0]?.preco ?? 0);
-  const [pagamento, setPagamento] = useState<string>(PAYMENT_METHODS[0]);
-  const [pago, setPago] = useState(false);
+  const others = (rooms ?? []).filter((r) => r.numero !== reservation.quarto);
+  const [newRoom, setNewRoom] = useState<number>(others[0]?.numero ?? reservation.quarto);
+  const [reason, setReason] = useState<string>("");
+  const [desc, setDesc] = useState("");
+  const [override, setOverride] = useState(false);
 
-  const nights = nightsBetween(checkin, checkout);
-  const total = nights * valorDiaria;
-  const overlap = quarto && checkin && checkout && hasPaidOverlap(reservations, quarto, checkin, checkout);
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!checkout || nights <= 0) return toast.error("Informe um período válido");
-    if (overlap) return toast.error("Já existe reserva ativa para este quarto no período");
-    const cli = clients?.find((c) => c.id === clienteId);
-    onSave({
-      quarto,
-      cliente_id: clienteId || null,
-      cliente_nome: cli?.nome ?? nome.trim(),
-      checkin,
-      checkout,
-      diarias: nights,
-      valor_diaria: valorDiaria,
-      valor_total: total,
-      pagamento,
-      pago,
-      status: "reservado",
-    });
-  }
+  const overlap = hasPaidOverlap(reservations, newRoom, reservation.checkin, reservation.checkout, reservation.id);
+  const block = roomBlock(complaints ?? [], newRoom);
+  const blocked = !!block && !override;
 
   return (
-    <Modal open onClose={onClose} title="Nova reserva">
-      <form onSubmit={submit} className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Quarto">
-            <select
-              className="field"
-              value={quarto}
-              onChange={(e) => {
-                const num = Number(e.target.value);
-                setQuarto(num);
-                const room = rooms?.find((r) => r.numero === num);
-                if (room) setValorDiaria(room.preco);
-              }}
-            >
-              {rooms?.map((r) => (
-                <option key={r.numero} value={r.numero}>
-                  {r.numero} — {fmtBRL(r.preco)} ({r.andar}º)
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Valor da diária">
-            <input
-              type="number"
-              className="field"
-              value={valorDiaria}
-              min={0}
-              onChange={(e) => setValorDiaria(Number(e.target.value))}
-            />
-          </Field>
-        </div>
-
-        <Field label="Cliente cadastrado (opcional)">
-          <select className="field" value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
-            <option value="">— digitar nome manualmente —</option>
-            {clients?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nome}
+    <Modal open onClose={onClose} title={`Trocar quarto — ${reservation.cliente_nome}`}>
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          Hóspede atualmente no quarto <strong>{reservation.quarto}</strong>.
+        </p>
+        <Field label="Novo quarto">
+          <select className="field" value={newRoom} onChange={(e) => { setNewRoom(Number(e.target.value)); setOverride(false); }}>
+            {others.map((r) => (
+              <option key={r.numero} value={r.numero}>
+                {r.numero} ({r.andar}º)
               </option>
             ))}
           </select>
         </Field>
-        {!clienteId && (
-          <Field label="Nome do hóspede">
-            <input className="field" value={nome} onChange={(e) => setNome(e.target.value)} required maxLength={80} />
+
+        <Field label="Motivo da saída do quarto anterior (bloqueia novos hóspedes)">
+          <select className="field" value={reason} onChange={(e) => setReason(e.target.value)}>
+            <option value="">Sem motivo (não bloquear)</option>
+            {ROOM_BLOCK_REASONS.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        {reason && (
+          <Field label="Detalhe (opcional)">
+            <input className="field" value={desc} onChange={(e) => setDesc(e.target.value)} maxLength={200} />
           </Field>
         )}
-
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Check-in">
-            <input type="date" className="field" value={checkin} onChange={(e) => setCheckin(e.target.value)} required />
-          </Field>
-          <Field label="Check-out">
-            <input type="date" className="field" value={checkout} onChange={(e) => setCheckout(e.target.value)} required />
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Pagamento">
-            <select className="field" value={pagamento} onChange={(e) => setPagamento(e.target.value)}>
-              {PAYMENT_METHODS.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <label className="flex items-end gap-2 pb-2">
-            <input type="checkbox" checked={pago} onChange={(e) => setPago(e.target.checked)} />
-            <span className="text-sm font-semibold">Já pago</span>
-          </label>
-        </div>
 
         {overlap && (
           <p className="rounded-lg bg-brick-bg px-3 py-2 text-sm text-brick">
-            ⚠ Este quarto já tem reserva ativa que se sobrepõe a este período.
+            ⚠ O quarto {newRoom} já tem reserva no período desta hospedagem.
           </p>
         )}
-
-        <div className="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
-          <span className="text-sm text-muted-foreground">{nights} diária(s)</span>
-          <span className="font-serif text-lg font-bold">{fmtBRL(total)}</span>
-        </div>
+        {block && (
+          <div className="rounded-lg bg-brick-bg px-3 py-2 text-sm">
+            <p className="font-semibold text-brick">
+              ⚠ Quarto {newRoom} bloqueado: {complaintLabel(block.categoria)}
+            </p>
+            <p className="mt-1 text-brick">Liberar mesmo assim?</p>
+            <div className="mt-2 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setOverride(true)}
+                className={`rounded-md px-3 py-1 text-xs font-semibold ${override ? "bg-pine text-primary-foreground" : "bg-sage-bg text-pine-dark"}`}
+              >
+                Sim
+              </button>
+              <button
+                type="button"
+                onClick={() => setOverride(false)}
+                className={`rounded-md px-3 py-1 text-xs font-semibold ${!override ? "bg-brick text-white" : "bg-muted text-muted-foreground"}`}
+              >
+                Não
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className="btn-ghost">
             Cancelar
           </button>
-          <button type="submit" className="btn-primary" disabled={!!overlap}>
-            Salvar reserva
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={overlap || blocked}
+            onClick={() => onConfirm(newRoom, reason || null, desc.trim())}
+          >
+            Confirmar troca
           </button>
         </div>
-      </form>
+      </div>
     </Modal>
   );
 }
 
-void RESERVATION_STATUS;
+void statusFromPayment;
