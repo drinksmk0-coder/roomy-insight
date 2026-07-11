@@ -77,10 +77,15 @@ function Reclamacoes() {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={showResolved} onChange={(e) => setShowResolved(e.target.checked)} />
-          Mostrar resolvidas
-        </label>
+        <select className="field max-w-xs" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <option value="abertas">Não resolvidas</option>
+          {COMPLAINT_STATUS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+          <option value="todas">Todos os status</option>
+        </select>
       </div>
 
       {filtered.length === 0 ? (
