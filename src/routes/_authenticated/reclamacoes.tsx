@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Plus, Download } from "lucide-react";
 import { useRooms, useComplaints, useInsert, useUpdate } from "@/lib/data";
 import { fmtDate, todayISO, downloadCSV } from "@/lib/format";
-import { COMPLAINT_CATEGORIES, COMPLAINT_SEVERITY, WIFI_DEVICES, complaintLabel } from "@/lib/constants";
+import { COMPLAINT_CATEGORIES, COMPLAINT_SEVERITY, COMPLAINT_STATUS, WIFI_DEVICES, complaintLabel, complaintStatusLabel } from "@/lib/constants";
 import { PageHeader } from "@/components/AppLayout";
 import { Modal, Field, Badge, EmptyState } from "@/components/ui-kit";
 
