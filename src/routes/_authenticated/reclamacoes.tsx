@@ -102,6 +102,9 @@ function Reclamacoes() {
                   <Badge tone="slate">{complaintLabel(c.categoria)}</Badge>
                   <Badge tone={sevTone[c.gravidade]}>{c.gravidade}</Badge>
                   <Badge tone={c.origem === "qrcode" ? "brass" : "sage"}>{c.origem}</Badge>
+                  <Badge tone={c.status === "resolvido" ? "sage" : c.status === "em_andamento" ? "brass" : "brick"}>
+                    {complaintStatusLabel(c.status)}
+                  </Badge>
                 </div>
                 {c.descricao && <p className="mt-1 text-sm text-muted-foreground">{c.descricao}</p>}
                 <p className="mt-1 text-[11px] text-muted-foreground">
@@ -111,6 +114,14 @@ function Reclamacoes() {
                 </p>
               </div>
               <div className="flex gap-1.5">
+                {c.status === "aberto" && (
+                  <button
+                    className="rounded-md bg-brass-bg px-2.5 py-1 text-xs font-semibold text-[oklch(0.4_0.06_74)]"
+                    onClick={() => update.mutate({ id: c.id, patch: { status: "em_andamento" } })}
+                  >
+                    Em andamento
+                  </button>
+                )}
                 {c.status !== "resolvido" ? (
                   <button
                     className="rounded-md bg-sage-bg px-2.5 py-1 text-xs font-semibold text-pine-dark"
@@ -121,7 +132,12 @@ function Reclamacoes() {
                     Resolver
                   </button>
                 ) : (
-                  <Badge tone="sage">resolvido</Badge>
+                  <button
+                    className="rounded-md bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground"
+                    onClick={() => update.mutate({ id: c.id, patch: { status: "aberto", resolved_at: null } })}
+                  >
+                    Reabrir
+                  </button>
                 )}
               </div>
             </div>
