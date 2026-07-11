@@ -132,42 +132,87 @@ function ClientForm({
   onSave,
 }: {
   onClose: () => void;
-  onSave: (row: Pick<Client, "nome" | "tipo" | "telefone" | "documento">) => void;
+  onSave: (
+    row: Pick<
+      Client,
+      "nome" | "tipo" | "telefone" | "documento" | "cpf" | "data_nascimento" | "profissao" | "cidade" | "estado"
+    >,
+  ) => void;
 }) {
   const [nome, setNome] = useState("");
   const [tipo, setTipo] = useState<string>(CLIENT_TYPES[0]);
   const [telefone, setTelefone] = useState("");
-  const [documento, setDocumento] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [nascimento, setNascimento] = useState("");
+  const [profissao, setProfissao] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
 
   return (
     <Modal open onClose={onClose} title="Novo cliente">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          onSave({ nome: nome.trim(), tipo, telefone: telefone.trim() || null, documento: documento.trim() || null });
+          onSave({
+            nome: nome.trim(),
+            tipo,
+            telefone: telefone.trim() || null,
+            documento: null,
+            cpf: cpf.trim() || null,
+            data_nascimento: nascimento || null,
+            profissao: profissao.trim() || null,
+            cidade: cidade.trim() || null,
+            estado: estado || null,
+          });
         }}
         className="space-y-3"
       >
         <Field label="Nome">
           <input className="field" value={nome} onChange={(e) => setNome(e.target.value)} required maxLength={80} />
         </Field>
-        <Field label="Tipo">
-          <select className="field" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-            {CLIENT_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </Field>
         <div className="grid grid-cols-2 gap-3">
+          <Field label="Tipo">
+            <select className="field" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+              {CLIENT_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </Field>
           <Field label="Telefone">
             <input className="field" value={telefone} onChange={(e) => setTelefone(e.target.value)} maxLength={20} />
           </Field>
-          <Field label="Documento">
-            <input className="field" value={documento} onChange={(e) => setDocumento(e.target.value)} maxLength={30} />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="CPF">
+            <input className="field" value={cpf} onChange={(e) => setCpf(e.target.value)} maxLength={14} />
+          </Field>
+          <Field label="Data de nascimento">
+            <input type="date" className="field" value={nascimento} onChange={(e) => setNascimento(e.target.value)} />
           </Field>
         </div>
+        <Field label="Profissão">
+          <input className="field" value={profissao} onChange={(e) => setProfissao(e.target.value)} maxLength={60} />
+        </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Cidade">
+            <input className="field" value={cidade} onChange={(e) => setCidade(e.target.value)} maxLength={60} />
+          </Field>
+          <Field label="Estado">
+            <select className="field" value={estado} onChange={(e) => setEstado(e.target.value)}>
+              <option value="">—</option>
+              {BR_STATES.map((uf) => (
+                <option key={uf} value={uf}>
+                  {uf}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          A data e o horário do cadastro são registrados automaticamente.
+        </p>
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className="btn-ghost">
             Cancelar
@@ -179,4 +224,5 @@ function ClientForm({
       </form>
     </Modal>
   );
+}
 }
