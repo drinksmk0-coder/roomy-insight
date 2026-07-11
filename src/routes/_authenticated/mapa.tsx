@@ -1,18 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import { Plus } from "lucide-react";
 import {
   useRooms,
+  useClients,
   useReservations,
   useSales,
   useComplaints,
+  useInsert,
   roomStatusToday,
   activeReservationForRoom,
+  futureReservationsForRoom,
+  roomBlock,
   type Room,
 } from "@/lib/data";
 import { fmtBRL, fmtDate, todayISO } from "@/lib/format";
 import { complaintLabel } from "@/lib/constants";
 import { PageHeader } from "@/components/AppLayout";
 import { Modal, Badge } from "@/components/ui-kit";
+import { ReservaForm } from "@/components/ReservaForm";
 
 export const Route = createFileRoute("/_authenticated/mapa")({
   component: Mapa,
@@ -28,15 +35,19 @@ const STATUS_STYLE: Record<string, { bg: string; label: string }> = {
 function Mapa() {
   const today = todayISO();
   const { data: rooms = [] } = useRooms();
+  const { data: clients = [] } = useClients();
   const { data: reservations = [] } = useReservations();
   const { data: sales = [] } = useSales();
   const { data: complaints = [] } = useComplaints();
-  const [heatmap, setHeatmap] = useState(false);
+  const insert = useInsert("reservations", ["reservations"]);
   const [selected, setSelected] = useState<Room | null>(null);
+  const [newFor, setNewFor] = useState<number | null>(null);
 
   const complaintsByRoom = useMemo(() => {
     const m = new Map<number, number>();
-    complaints.forEach((c) => c.quarto != null && m.set(c.quarto, (m.get(c.quarto) ?? 0) + 1));
+    complaints
+      .filter((c) => c.status !== "resolvido")
+      .forEach((c) => c.quarto != null && m.set(c.quarto, (m.get(c.quarto) ?? 0) + 1));
     return m;
   }, [complaints]);
 
@@ -55,15 +66,7 @@ function Mapa() {
     <div>
       <PageHeader
         title="Mapa de quartos"
-        subtitle="Situação de cada quarto hoje. Ative o mapa de calor para ver onde há mais reclamações."
-        action={
-          <button
-            onClick={() => setHeatmap((v) => !v)}
-            className={heatmap ? "btn-primary" : "btn-ghost"}
-          >
-            {heatmap ? "Mapa de calor: ligado" : "Mapa de calor: desligado"}
-          </button>
-        }
+        subtitle="Situação de cada quarto hoje, com mapa de calor de reclamações sempre ativo. Clique num quarto para ver detalhes ou criar reserva."
       />
 
       <div className="mb-4 flex flex-wrap gap-3 text-xs">
@@ -72,6 +75,9 @@ function Mapa() {
             <span className={`inline-block h-3 w-3 rounded ${s.bg.split(" ")[0]}`} /> {s.label}
           </span>
         ))}
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-3 rounded bg-brick" /> intensidade = reclamações abertas
+        </span>
       </div>
 
       <div className="space-y-6">
@@ -85,23 +91,25 @@ function Mapa() {
                 const st = roomStatusToday(reservations, r.numero, today);
                 const style = STATUS_STYLE[st] ?? STATUS_STYLE.livre;
                 const n = complaintsByRoom.get(r.numero) ?? 0;
-                const heat = heatmap && n > 0;
                 const intensity = n / maxComplaints;
+                const blocked = !!roomBlock(complaints, r.numero);
                 return (
                   <button
                     key={r.numero}
                     onClick={() => setSelected(r)}
-                    className={`relative aspect-square rounded-lg border p-2 text-left transition hover:scale-[1.03] ${heat ? "border-brick text-brick" : style.bg}`}
-                    style={heat ? { backgroundColor: `rgba(200,60,40,${0.12 + intensity * 0.5})` } : undefined}
+                    className={`relative aspect-square rounded-lg border p-2 text-left transition hover:scale-[1.03] ${n > 0 ? "border-brick" : style.bg}`}
+                    style={n > 0 ? { backgroundColor: `rgba(200,60,40,${0.12 + intensity * 0.5})` } : undefined}
                   >
                     <div className="font-serif text-lg font-bold">{r.numero}</div>
                     <div className="text-[10px] opacity-80">{fmtBRL(r.preco)}</div>
-                    {!heatmap && <div className="mt-1 text-[10px] font-semibold">{style.label}</div>}
-                    {heatmap && <div className="mt-1 text-[10px] font-semibold">{n} reclam.</div>}
-                    {!heatmap && n > 0 && (
+                    <div className="mt-1 text-[10px] font-semibold">{style.label}</div>
+                    {n > 0 && (
                       <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brick px-1 text-[9px] font-bold text-white">
                         {n}
                       </span>
+                    )}
+                    {blocked && (
+                      <span className="absolute bottom-1 right-1 text-[9px] font-bold text-brick">🔒</span>
                     )}
                   </button>
                 );
@@ -116,8 +124,35 @@ function Mapa() {
           room={selected}
           onClose={() => setSelected(null)}
           reservation={activeReservationForRoom(reservations, selected.numero)}
+          futureReservations={futureReservationsForRoom(reservations, selected.numero, today).filter(
+            (fr) => fr.id !== activeReservationForRoom(reservations, selected.numero)?.id,
+          )}
           sales={sales.filter((s) => s.quarto === selected.numero)}
           complaints={complaints.filter((c) => c.quarto === selected.numero)}
+          onNew={() => {
+            setNewFor(selected.numero);
+            setSelected(null);
+          }}
+        />
+      )}
+
+      {newFor != null && (
+        <ReservaForm
+          rooms={rooms}
+          clients={clients}
+          reservations={reservations}
+          complaints={complaints}
+          fixedRoom={newFor}
+          onClose={() => setNewFor(null)}
+          onSave={(row) =>
+            insert.mutate(row as never, {
+              onSuccess: () => {
+                toast.success("Reserva criada");
+                setNewFor(null);
+              },
+              onError: (e) => toast.error(e.message),
+            })
+          }
         />
       )}
     </div>
@@ -128,16 +163,19 @@ function RoomModal({
   room,
   onClose,
   reservation,
+  futureReservations,
   sales,
   complaints,
+  onNew,
 }: {
   room: Room;
   onClose: () => void;
   reservation: ReturnType<typeof activeReservationForRoom>;
+  futureReservations: { id: string; cliente_nome: string; checkin: string; checkout: string; status: string }[];
   sales: { id: string; item: string; qtd: number; total: number; reserva_id: string | null }[];
   complaints: { id: string; categoria: string; descricao: string | null; status: string; created_at: string }[];
+  onNew: () => void;
 }) {
-  // Sales linked to the active stay (or unlinked sales in the room)
   const stayId = reservation?.id;
   const staySales = stayId ? sales.filter((s) => s.reserva_id === stayId || s.reserva_id == null) : sales;
   const salesTotal = staySales.reduce((s, v) => s + Number(v.total), 0);
@@ -146,6 +184,11 @@ function RoomModal({
 
   return (
     <Modal open onClose={onClose} title={`Quarto ${room.numero} — ${room.andar}º andar`} wide>
+      <div className="mb-4 flex justify-end">
+        <button onClick={onNew} className="btn-primary flex items-center gap-1.5">
+          <Plus className="h-4 w-4" /> Nova reserva neste quarto
+        </button>
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
         <section>
           <h4 className="mb-2 font-semibold">Hospedagem atual</h4>
@@ -165,6 +208,22 @@ function RoomModal({
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">Sem reserva ativa.</p>
+          )}
+
+          <h4 className="mb-2 mt-4 font-semibold">Próximas reservas</h4>
+          {futureReservations.length ? (
+            <ul className="space-y-1 text-sm">
+              {futureReservations.map((fr) => (
+                <li key={fr.id} className="flex items-center justify-between border-b border-border/60 py-1">
+                  <span>
+                    {fr.cliente_nome} · {fmtDate(fr.checkin)} → {fmtDate(fr.checkout)}
+                  </span>
+                  <Badge tone="brass">{fr.status}</Badge>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">Nenhuma reserva futura — quarto livre para novas datas.</p>
           )}
 
           <h4 className="mb-2 mt-4 font-semibold">Vendas desta estadia</h4>

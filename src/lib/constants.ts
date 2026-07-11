@@ -51,3 +51,29 @@ export const WIFI_DEVICES = [
   "Smart TV",
   "Não sei",
 ] as const;
+
+export const COMPLAINT_STATUS = [
+  { value: "aberto", label: "Aberto" },
+  { value: "em_andamento", label: "Em andamento" },
+  { value: "resolvido", label: "Resolvido" },
+] as const;
+
+export function complaintStatusLabel(v: string): string {
+  return COMPLAINT_STATUS.find((s) => s.value === v)?.label ?? v;
+}
+
+// Reasons a room may be blocked when a guest is moved out.
+export const ROOM_BLOCK_REASONS = [
+  { value: "limpeza", label: "Quarto sujo / precisa de limpeza" },
+  { value: "chuveiro_frio", label: "Chuveiro frio / sem água quente" },
+  { value: "wifi", label: "Wi-Fi sem sinal" },
+  { value: "ar_ventilacao", label: "Ar-condicionado com defeito" },
+  { value: "manutencao", label: "Manutenção geral" },
+  { value: "outros", label: "Outro motivo" },
+] as const;
+
+export const BR_STATES = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+  "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
+  "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+] as const;

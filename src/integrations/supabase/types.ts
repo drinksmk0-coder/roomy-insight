@@ -16,31 +16,46 @@ export type Database = {
     Tables: {
       clients: {
         Row: {
+          cidade: string | null
+          cpf: string | null
           created_at: string
           created_by: string | null
+          data_nascimento: string | null
           documento: string | null
+          estado: string | null
           id: string
           nome: string
+          profissao: string | null
           telefone: string | null
           tipo: string
           visitas: number
         }
         Insert: {
+          cidade?: string | null
+          cpf?: string | null
           created_at?: string
           created_by?: string | null
+          data_nascimento?: string | null
           documento?: string | null
+          estado?: string | null
           id?: string
           nome: string
+          profissao?: string | null
           telefone?: string | null
           tipo?: string
           visitas?: number
         }
         Update: {
+          cidade?: string | null
+          cpf?: string | null
           created_at?: string
           created_by?: string | null
+          data_nascimento?: string | null
           documento?: string | null
+          estado?: string | null
           id?: string
           nome?: string
+          profissao?: string | null
           telefone?: string | null
           tipo?: string
           visitas?: number
@@ -181,6 +196,7 @@ export type Database = {
       reservations: {
         Row: {
           checkin: string
+          checkin_at: string | null
           checkout: string
           cliente_id: string | null
           cliente_nome: string
@@ -194,10 +210,12 @@ export type Database = {
           status: string
           updated_at: string
           valor_diaria: number
+          valor_pago: number
           valor_total: number
         }
         Insert: {
           checkin: string
+          checkin_at?: string | null
           checkout: string
           cliente_id?: string | null
           cliente_nome: string
@@ -211,10 +229,12 @@ export type Database = {
           status?: string
           updated_at?: string
           valor_diaria?: number
+          valor_pago?: number
           valor_total?: number
         }
         Update: {
           checkin?: string
+          checkin_at?: string | null
           checkout?: string
           cliente_id?: string | null
           cliente_nome?: string
@@ -228,6 +248,7 @@ export type Database = {
           status?: string
           updated_at?: string
           valor_diaria?: number
+          valor_pago?: number
           valor_total?: number
         }
         Relationships: [

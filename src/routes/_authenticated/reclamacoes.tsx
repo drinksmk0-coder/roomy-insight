@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Plus, Download } from "lucide-react";
 import { useRooms, useComplaints, useInsert, useUpdate } from "@/lib/data";
 import { fmtDate, todayISO, downloadCSV } from "@/lib/format";
-import { COMPLAINT_CATEGORIES, COMPLAINT_SEVERITY, WIFI_DEVICES, complaintLabel } from "@/lib/constants";
+import { COMPLAINT_CATEGORIES, COMPLAINT_SEVERITY, COMPLAINT_STATUS, WIFI_DEVICES, complaintLabel, complaintStatusLabel } from "@/lib/constants";
 import { PageHeader } from "@/components/AppLayout";
 import { Modal, Field, Badge, EmptyState } from "@/components/ui-kit";
 
@@ -21,14 +21,17 @@ function Reclamacoes() {
   const update = useUpdate("complaints", ["complaints"]);
   const [open, setOpen] = useState(false);
   const [cat, setCat] = useState("todas");
-  const [showResolved, setShowResolved] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("abertas");
 
   const filtered = useMemo(
     () =>
-      complaints.filter(
-        (c) => (cat === "todas" || c.categoria === cat) && (showResolved || c.status !== "resolvido"),
-      ),
-    [complaints, cat, showResolved],
+      complaints.filter((c) => {
+        if (cat !== "todas" && c.categoria !== cat) return false;
+        if (statusFilter === "abertas") return c.status !== "resolvido";
+        if (statusFilter === "todas") return true;
+        return c.status === statusFilter;
+      }),
+    [complaints, cat, statusFilter],
   );
 
   function exportCSV() {
@@ -74,10 +77,15 @@ function Reclamacoes() {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={showResolved} onChange={(e) => setShowResolved(e.target.checked)} />
-          Mostrar resolvidas
-        </label>
+        <select className="field max-w-xs" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <option value="abertas">Não resolvidas</option>
+          {COMPLAINT_STATUS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+          <option value="todas">Todos os status</option>
+        </select>
       </div>
 
       {filtered.length === 0 ? (
@@ -94,6 +102,9 @@ function Reclamacoes() {
                   <Badge tone="slate">{complaintLabel(c.categoria)}</Badge>
                   <Badge tone={sevTone[c.gravidade]}>{c.gravidade}</Badge>
                   <Badge tone={c.origem === "qrcode" ? "brass" : "sage"}>{c.origem}</Badge>
+                  <Badge tone={c.status === "resolvido" ? "sage" : c.status === "em_andamento" ? "brass" : "brick"}>
+                    {complaintStatusLabel(c.status)}
+                  </Badge>
                 </div>
                 {c.descricao && <p className="mt-1 text-sm text-muted-foreground">{c.descricao}</p>}
                 <p className="mt-1 text-[11px] text-muted-foreground">
@@ -103,6 +114,14 @@ function Reclamacoes() {
                 </p>
               </div>
               <div className="flex gap-1.5">
+                {c.status === "aberto" && (
+                  <button
+                    className="rounded-md bg-brass-bg px-2.5 py-1 text-xs font-semibold text-[oklch(0.4_0.06_74)]"
+                    onClick={() => update.mutate({ id: c.id, patch: { status: "em_andamento" } })}
+                  >
+                    Em andamento
+                  </button>
+                )}
                 {c.status !== "resolvido" ? (
                   <button
                     className="rounded-md bg-sage-bg px-2.5 py-1 text-xs font-semibold text-pine-dark"
@@ -113,7 +132,12 @@ function Reclamacoes() {
                     Resolver
                   </button>
                 ) : (
-                  <Badge tone="sage">resolvido</Badge>
+                  <button
+                    className="rounded-md bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground"
+                    onClick={() => update.mutate({ id: c.id, patch: { status: "aberto", resolved_at: null } })}
+                  >
+                    Reabrir
+                  </button>
                 )}
               </div>
             </div>
