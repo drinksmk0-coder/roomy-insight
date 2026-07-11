@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
+import type { MaintenanceWindow } from "./maintenance-helpers";
 
 export type Room = Tables<"rooms">;
 export type Client = Tables<"clients">;
@@ -90,8 +91,22 @@ export function useFeedbacks() {
   });
 }
 
+export function useMaintenanceWindows() {
+  return useQuery({
+    queryKey: ["maintenance"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("maintenance_windows")
+        .select("*")
+        .order("data_inicio", { ascending: false });
+      if (error) throw error;
+      return data as MaintenanceWindow[];
+    },
+  });
+}
+
 // Generic table mutations
-type TableName = "clients" | "reservations" | "sales" | "complaints" | "rooms" | "feedbacks";
+type TableName = "clients" | "reservations" | "sales" | "complaints" | "rooms" | "feedbacks" | "maintenance_windows";
 
 export function useInsert<T extends TableName>(table: T, invalidate: string[]) {
   const qc = useQueryClient();
