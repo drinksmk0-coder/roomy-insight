@@ -93,6 +93,13 @@ function Clientes() {
                 </div>
                 <Badge tone={c.tipo === "cliente fixo" ? "brass" : "sage"}>{c.tipo}</Badge>
               </div>
+              <div className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+                {c.cpf && <p>CPF: {c.cpf}</p>}
+                {(c.cidade || c.estado) && <p>{[c.cidade, c.estado].filter(Boolean).join(" / ")}</p>}
+                {c.profissao && <p>{c.profissao}</p>}
+                {c.data_nascimento && <p>Nasc.: {fmtDate(c.data_nascimento)}</p>}
+                <p>Cadastrado em {fmtDate(c.created_at)}</p>
+              </div>
               <div className="mt-3 flex justify-between text-sm">
                 <span className="text-muted-foreground">{c.visitas} visita(s)</span>
                 <span className="font-semibold">{fmtBRL(spentByClient.get(c.id) ?? 0)}</span>
