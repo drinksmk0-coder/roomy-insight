@@ -37,8 +37,19 @@ function Clientes() {
 
   function exportCSV() {
     downloadCSV(`clientes-${todayISO()}.csv`, [
-      ["Nome", "Tipo", "Telefone", "Documento", "Visitas"],
-      ...clients.map((c) => [c.nome, c.tipo, c.telefone, c.documento, c.visitas]),
+      ["Nome", "Tipo", "Telefone", "CPF", "Nascimento", "Profissão", "Cidade", "Estado", "Visitas", "Cadastrado em"],
+      ...clients.map((c) => [
+        c.nome,
+        c.tipo,
+        c.telefone,
+        c.cpf,
+        c.data_nascimento,
+        c.profissao,
+        c.cidade,
+        c.estado,
+        c.visitas,
+        c.created_at.slice(0, 10),
+      ]),
     ]);
   }
 
