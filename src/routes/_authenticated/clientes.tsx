@@ -3,8 +3,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Download, Search } from "lucide-react";
 import { useClients, useReservations, useInsert, type Client } from "@/lib/data";
-import { fmtBRL, downloadCSV, todayISO } from "@/lib/format";
-import { CLIENT_TYPES } from "@/lib/constants";
+import { fmtBRL, fmtDate, downloadCSV, todayISO } from "@/lib/format";
+import { CLIENT_TYPES, BR_STATES } from "@/lib/constants";
 import { PageHeader } from "@/components/AppLayout";
 import { Modal, Field, Badge, EmptyState } from "@/components/ui-kit";
 
