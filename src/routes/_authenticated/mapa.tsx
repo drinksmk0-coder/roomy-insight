@@ -136,6 +136,18 @@ function Mapa() {
             setNewFor(selected.numero);
             setSelected(null);
           }}
+          onSituacao={(situacao) => {
+            updateRoom.mutate(
+              { id: selected.numero, patch: { situacao } },
+              {
+                onSuccess: () => {
+                  toast.success(situacao ? "Situação do quarto atualizada" : "Situação removida");
+                  setSelected((prev) => (prev ? { ...prev, situacao } : prev));
+                },
+                onError: (e) => toast.error(e.message),
+              },
+            );
+          }}
         />
       )}
 
