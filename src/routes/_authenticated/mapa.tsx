@@ -9,6 +9,7 @@ import {
   useSales,
   useComplaints,
   useInsert,
+  useUpdate,
   roomStatusToday,
   activeReservationForRoom,
   futureReservationsForRoom,
