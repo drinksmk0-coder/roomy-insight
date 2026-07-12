@@ -166,6 +166,36 @@ export function ReservaForm({
           </Field>
         </div>
 
+        <div class="grid grid-cols-3 gap-3">
+          <Field label="Pessoas">
+            <input
+              type="number"
+              className="field"
+              value={pessoas}
+              min={1}
+              onChange={(e) => setPessoas(Number(e.target.value))}
+            />
+          </Field>
+          <Field label="Desconto (R$)">
+            <input
+              type="number"
+              className="field"
+              value={desconto}
+              min={0}
+              onChange={(e) => setDesconto(Number(e.target.value))}
+            />
+          </Field>
+          <Field label="Canal de vendas">
+            <select className="field" value={canal} onChange={(e) => setCanal(e.target.value)}>
+              {SALES_CHANNELS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <Field label="Forma de pagamento">
             <select className="field" value={pagamento} onChange={(e) => setPagamento(e.target.value)}>
