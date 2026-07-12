@@ -10,7 +10,7 @@ import {
   type Complaint,
 } from "@/lib/data";
 import { fmtBRL, todayISO, nightsBetween } from "@/lib/format";
-import { PAYMENT_METHODS, complaintLabel } from "@/lib/constants";
+import { PAYMENT_METHODS, SALES_CHANNELS, complaintLabel } from "@/lib/constants";
 import { Modal, Field } from "@/components/ui-kit";
 
 export type ReservaRow = {
@@ -23,6 +23,9 @@ export type ReservaRow = {
   valor_diaria: number;
   valor_total: number;
   valor_pago: number;
+  desconto: number;
+  pessoas: number;
+  canal: string;
   pagamento: string;
   pago: boolean;
   status: string;
