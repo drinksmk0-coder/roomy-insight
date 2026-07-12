@@ -91,7 +91,7 @@ function Mapa() {
             </h3>
             <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8">
               {list.map((r) => {
-                const st = roomStatusToday(reservations, r.numero, today);
+                const st = roomStatusToday(reservations, r.numero, today, r.situacao);
                 const style = STATUS_STYLE[st] ?? STATUS_STYLE.livre;
                 const n = complaintsByRoom.get(r.numero) ?? 0;
                 const intensity = n / maxComplaints;
