@@ -182,6 +182,7 @@ function RoomModal({
   sales,
   complaints,
   onNew,
+  onSituacao,
 }: {
   room: Room;
   onClose: () => void;
@@ -190,6 +191,7 @@ function RoomModal({
   sales: { id: string; item: string; qtd: number; total: number; reserva_id: string | null }[];
   complaints: { id: string; categoria: string; descricao: string | null; status: string; created_at: string }[];
   onNew: () => void;
+  onSituacao: (situacao: string | null) => void;
 }) {
   const stayId = reservation?.id;
   const staySales = stayId ? sales.filter((s) => s.reserva_id === stayId || s.reserva_id == null) : sales;
@@ -199,7 +201,32 @@ function RoomModal({
 
   return (
     <Modal open onClose={onClose} title={`Quarto ${room.numero} — ${room.andar}º andar`} wide>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => onSituacao(room.situacao === "limpeza" ? null : "limpeza")}
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold ${room.situacao === "limpeza" ? "bg-slate text-white" : "bg-slate-bg text-slate"}`}
+          >
+            {room.situacao === "limpeza" ? "✓ Em limpeza" : "Marcar limpeza"}
+          </button>
+          <button
+            type="button"
+            onClick={() => onSituacao(room.situacao === "manutencao" ? null : "manutencao")}
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold ${room.situacao === "manutencao" ? "bg-slate text-white" : "bg-slate-bg text-slate"}`}
+          >
+            {room.situacao === "manutencao" ? "✓ Em manutenção" : "Marcar manutenção"}
+          </button>
+          {room.situacao && (
+            <button
+              type="button"
+              onClick={() => onSituacao(null)}
+              className="rounded-md bg-muted px-3 py-1.5 text-xs font-semibold text-muted-foreground"
+            >
+              Liberar quarto
+            </button>
+          )}
+        </div>
         <button onClick={onNew} className="btn-primary flex items-center gap-1.5">
           <Plus className="h-4 w-4" /> Nova reserva neste quarto
         </button>
