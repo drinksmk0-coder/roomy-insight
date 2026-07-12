@@ -29,6 +29,7 @@ const STATUS_STYLE: Record<string, { bg: string; label: string }> = {
   livre: { bg: "bg-sage-bg border-sage/40 text-pine-dark", label: "Livre" },
   ocupado: { bg: "bg-brick-bg border-brick/40 text-brick", label: "Ocupado" },
   reservado: { bg: "bg-brass-bg border-brass/50 text-[oklch(0.4_0.06_74)]", label: "Reservado" },
+  limpeza: { bg: "bg-slate-bg border-slate/40 text-slate", label: "Em limpeza" },
   manutencao: { bg: "bg-slate-bg border-slate/40 text-slate", label: "Manutenção" },
 };
 
