@@ -62,10 +62,14 @@ export function ReservaForm({
   );
   const [pagamento, setPagamento] = useState<string>(editing?.pagamento ?? PAYMENT_METHODS[0]);
   const [valorPago, setValorPago] = useState<number>(editing?.valor_pago ?? 0);
+  const [desconto, setDesconto] = useState<number>(editing?.desconto ?? 0);
+  const [pessoas, setPessoas] = useState<number>(editing?.pessoas ?? 1);
+  const [canal, setCanal] = useState<string>(editing?.canal ?? SALES_CHANNELS[0]);
   const [override, setOverride] = useState(false);
 
   const nights = nightsBetween(checkin, checkout);
-  const total = nights * valorDiaria;
+  const bruto = nights * valorDiaria;
+  const total = Math.max(0, bruto - (Number(desconto) || 0));
   const overlap =
     quarto && checkin && checkout && hasPaidOverlap(reservations, quarto, checkin, checkout, editing?.id);
   const block = roomBlock(complaints, quarto);
