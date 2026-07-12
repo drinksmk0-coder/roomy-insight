@@ -72,6 +72,28 @@ export const ROOM_BLOCK_REASONS = [
   { value: "outros", label: "Outro motivo" },
 ] as const;
 
+// Sales channels (how the reservation arrived) — editable per reservation.
+export const SALES_CHANNELS = [
+  "Balcão / Direto",
+  "Google",
+  "Booking",
+  "WhatsApp",
+  "Indicação",
+  "Instagram",
+  "Telefone",
+  "Outro",
+] as const;
+
+// Manual room situation set from the map (independent of reservations).
+export const ROOM_SITUATIONS = [
+  { value: "limpeza", label: "Em limpeza" },
+  { value: "manutencao", label: "Em manutenção" },
+] as const;
+
+export function roomSituationLabel(v: string): string {
+  return ROOM_SITUATIONS.find((s) => s.value === v)?.label ?? v;
+}
+
 export const BR_STATES = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
   "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
