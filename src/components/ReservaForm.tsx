@@ -265,7 +265,8 @@ export function ReservaForm({
 
         <div className="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
           <span className="text-sm text-muted-foreground">
-            {nights} diária(s) · {status === "ocupado" ? "ficará ocupado" : "ficará reservado"}
+            {nights} diária(s){Number(desconto) > 0 ? ` · desconto ${fmtBRL(Number(desconto))}` : ""} ·{" "}
+            {status === "ocupado" ? "ficará ocupado" : "ficará reservado"}
           </span>
           <span className="font-serif text-lg font-bold">{fmtBRL(total)}</span>
         </div>
