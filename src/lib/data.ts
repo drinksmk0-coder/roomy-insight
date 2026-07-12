@@ -132,14 +132,22 @@ export function useDelete(table: TableName, invalidate: string[]) {
 }
 
 // --- Derived helpers ---
-export function roomStatusToday(reservations: Reservation[], numero: number, today: string): string {
+// `roomSituacao` is the manual override set from the map (limpeza/manutencao).
+export function roomStatusToday(
+  reservations: Reservation[],
+  numero: number,
+  today: string,
+  roomSituacao?: string | null,
+): string {
+  if (roomSituacao === "limpeza" || roomSituacao === "manutencao") return roomSituacao;
   const maint = reservations.find((r) => r.quarto === numero && r.status === "manutencao");
   if (maint) return "manutencao";
   const active = reservations.filter(
     (r) => r.quarto === numero && r.status !== "cancelado" && r.status !== "finalizado",
   );
   const occ = active.find((r) => r.checkin <= today && r.checkout > today);
-  if (occ) return occ.status === "ocupado" ? "ocupado" : "reservado";
+  // Fully paid stay covering today = ocupado; otherwise reservado.
+  if (occ) return occ.pago || occ.status === "ocupado" ? "ocupado" : "reservado";
   if (active.length) return "reservado";
   return "livre";
 }

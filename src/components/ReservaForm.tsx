@@ -10,7 +10,7 @@ import {
   type Complaint,
 } from "@/lib/data";
 import { fmtBRL, todayISO, nightsBetween } from "@/lib/format";
-import { PAYMENT_METHODS, complaintLabel } from "@/lib/constants";
+import { PAYMENT_METHODS, SALES_CHANNELS, complaintLabel } from "@/lib/constants";
 import { Modal, Field } from "@/components/ui-kit";
 
 export type ReservaRow = {
@@ -23,6 +23,9 @@ export type ReservaRow = {
   valor_diaria: number;
   valor_total: number;
   valor_pago: number;
+  desconto: number;
+  pessoas: number;
+  canal: string;
   pagamento: string;
   pago: boolean;
   status: string;
@@ -59,10 +62,14 @@ export function ReservaForm({
   );
   const [pagamento, setPagamento] = useState<string>(editing?.pagamento ?? PAYMENT_METHODS[0]);
   const [valorPago, setValorPago] = useState<number>(editing?.valor_pago ?? 0);
+  const [desconto, setDesconto] = useState<number>(editing?.desconto ?? 0);
+  const [pessoas, setPessoas] = useState<number>(editing?.pessoas ?? 1);
+  const [canal, setCanal] = useState<string>(editing?.canal ?? SALES_CHANNELS[0]);
   const [override, setOverride] = useState(false);
 
   const nights = nightsBetween(checkin, checkout);
-  const total = nights * valorDiaria;
+  const bruto = nights * valorDiaria;
+  const total = Math.max(0, bruto - (Number(desconto) || 0));
   const overlap =
     quarto && checkin && checkout && hasPaidOverlap(reservations, quarto, checkin, checkout, editing?.id);
   const block = roomBlock(complaints, quarto);
@@ -86,6 +93,9 @@ export function ReservaForm({
       valor_diaria: valorDiaria,
       valor_total: total,
       valor_pago: valorPago,
+      desconto: Number(desconto) || 0,
+      pessoas: Math.max(1, Number(pessoas) || 1),
+      canal,
       pagamento,
       pago: total > 0 && valorPago >= total,
       status,
@@ -153,6 +163,36 @@ export function ReservaForm({
           </Field>
           <Field label="Check-out">
             <input type="date" className="field" value={checkout} onChange={(e) => setCheckout(e.target.value)} required />
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <Field label="Pessoas">
+            <input
+              type="number"
+              className="field"
+              value={pessoas}
+              min={1}
+              onChange={(e) => setPessoas(Number(e.target.value))}
+            />
+          </Field>
+          <Field label="Desconto (R$)">
+            <input
+              type="number"
+              className="field"
+              value={desconto}
+              min={0}
+              onChange={(e) => setDesconto(Number(e.target.value))}
+            />
+          </Field>
+          <Field label="Canal de vendas">
+            <select className="field" value={canal} onChange={(e) => setCanal(e.target.value)}>
+              {SALES_CHANNELS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
           </Field>
         </div>
 
@@ -225,7 +265,8 @@ export function ReservaForm({
 
         <div className="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
           <span className="text-sm text-muted-foreground">
-            {nights} diária(s) · {status === "ocupado" ? "ficará ocupado" : "ficará reservado"}
+            {nights} diária(s){Number(desconto) > 0 ? ` · desconto ${fmtBRL(Number(desconto))}` : ""} ·{" "}
+            {status === "ocupado" ? "ficará ocupado" : "ficará reservado"}
           </span>
           <span className="font-serif text-lg font-bold">{fmtBRL(total)}</span>
         </div>

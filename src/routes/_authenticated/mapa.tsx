@@ -9,6 +9,7 @@ import {
   useSales,
   useComplaints,
   useInsert,
+  useUpdate,
   roomStatusToday,
   activeReservationForRoom,
   futureReservationsForRoom,
@@ -29,6 +30,7 @@ const STATUS_STYLE: Record<string, { bg: string; label: string }> = {
   livre: { bg: "bg-sage-bg border-sage/40 text-pine-dark", label: "Livre" },
   ocupado: { bg: "bg-brick-bg border-brick/40 text-brick", label: "Ocupado" },
   reservado: { bg: "bg-brass-bg border-brass/50 text-[oklch(0.4_0.06_74)]", label: "Reservado" },
+  limpeza: { bg: "bg-slate-bg border-slate/40 text-slate", label: "Em limpeza" },
   manutencao: { bg: "bg-slate-bg border-slate/40 text-slate", label: "Manutenção" },
 };
 
@@ -40,6 +42,7 @@ function Mapa() {
   const { data: sales = [] } = useSales();
   const { data: complaints = [] } = useComplaints();
   const insert = useInsert("reservations", ["reservations"]);
+  const updateRoom = useUpdate("rooms", ["rooms"]);
   const [selected, setSelected] = useState<Room | null>(null);
   const [newFor, setNewFor] = useState<number | null>(null);
 
@@ -88,7 +91,7 @@ function Mapa() {
             </h3>
             <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8">
               {list.map((r) => {
-                const st = roomStatusToday(reservations, r.numero, today);
+                const st = roomStatusToday(reservations, r.numero, today, r.situacao);
                 const style = STATUS_STYLE[st] ?? STATUS_STYLE.livre;
                 const n = complaintsByRoom.get(r.numero) ?? 0;
                 const intensity = n / maxComplaints;
@@ -133,6 +136,18 @@ function Mapa() {
             setNewFor(selected.numero);
             setSelected(null);
           }}
+          onSituacao={(situacao) => {
+            updateRoom.mutate(
+              { id: selected.numero, patch: { situacao } },
+              {
+                onSuccess: () => {
+                  toast.success(situacao ? "Situação do quarto atualizada" : "Situação removida");
+                  setSelected((prev) => (prev ? { ...prev, situacao } : prev));
+                },
+                onError: (e) => toast.error(e.message),
+              },
+            );
+          }}
         />
       )}
 
@@ -167,6 +182,7 @@ function RoomModal({
   sales,
   complaints,
   onNew,
+  onSituacao,
 }: {
   room: Room;
   onClose: () => void;
@@ -175,6 +191,7 @@ function RoomModal({
   sales: { id: string; item: string; qtd: number; total: number; reserva_id: string | null }[];
   complaints: { id: string; categoria: string; descricao: string | null; status: string; created_at: string }[];
   onNew: () => void;
+  onSituacao: (situacao: string | null) => void;
 }) {
   const stayId = reservation?.id;
   const staySales = stayId ? sales.filter((s) => s.reserva_id === stayId || s.reserva_id == null) : sales;
@@ -184,7 +201,32 @@ function RoomModal({
 
   return (
     <Modal open onClose={onClose} title={`Quarto ${room.numero} — ${room.andar}º andar`} wide>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => onSituacao(room.situacao === "limpeza" ? null : "limpeza")}
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold ${room.situacao === "limpeza" ? "bg-slate text-white" : "bg-slate-bg text-slate"}`}
+          >
+            {room.situacao === "limpeza" ? "✓ Em limpeza" : "Marcar limpeza"}
+          </button>
+          <button
+            type="button"
+            onClick={() => onSituacao(room.situacao === "manutencao" ? null : "manutencao")}
+            className={`rounded-md px-3 py-1.5 text-xs font-semibold ${room.situacao === "manutencao" ? "bg-slate text-white" : "bg-slate-bg text-slate"}`}
+          >
+            {room.situacao === "manutencao" ? "✓ Em manutenção" : "Marcar manutenção"}
+          </button>
+          {room.situacao && (
+            <button
+              type="button"
+              onClick={() => onSituacao(null)}
+              className="rounded-md bg-muted px-3 py-1.5 text-xs font-semibold text-muted-foreground"
+            >
+              Liberar quarto
+            </button>
+          )}
+        </div>
         <button onClick={onNew} className="btn-primary flex items-center gap-1.5">
           <Plus className="h-4 w-4" /> Nova reserva neste quarto
         </button>

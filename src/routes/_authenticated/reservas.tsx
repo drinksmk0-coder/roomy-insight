@@ -54,16 +54,34 @@ function Reservas() {
 
   function exportCSV() {
     const rows: (string | number | null)[][] = [
-      ["Quarto", "Cliente", "Check-in", "Check-out", "Diárias", "Total", "Pago", "Pagamento", "Status"],
+      [
+        "Quarto",
+        "Cliente",
+        "Check-in",
+        "Check-out",
+        "Diárias",
+        "Pessoas",
+        "Valor diária",
+        "Desconto",
+        "Total",
+        "Pago",
+        "Pagamento",
+        "Canal de vendas",
+        "Status",
+      ],
       ...reservations.map((r) => [
         r.quarto,
         r.cliente_nome,
         r.checkin,
         r.checkout,
         r.diarias,
+        r.pessoas,
+        r.valor_diaria,
+        r.desconto,
         r.valor_total,
         r.valor_pago,
         r.pagamento,
+        r.canal ?? "",
         r.status,
       ]),
     ];
