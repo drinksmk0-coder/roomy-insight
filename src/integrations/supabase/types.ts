@@ -195,6 +195,7 @@ export type Database = {
       }
       reservations: {
         Row: {
+          canal: string | null
           checkin: string
           checkin_at: string | null
           checkout: string
@@ -202,10 +203,12 @@ export type Database = {
           cliente_nome: string
           created_at: string
           created_by: string | null
+          desconto: number
           diarias: number
           id: string
           pagamento: string
           pago: boolean
+          pessoas: number
           quarto: number
           status: string
           updated_at: string
@@ -214,6 +217,7 @@ export type Database = {
           valor_total: number
         }
         Insert: {
+          canal?: string | null
           checkin: string
           checkin_at?: string | null
           checkout: string
@@ -221,10 +225,12 @@ export type Database = {
           cliente_nome: string
           created_at?: string
           created_by?: string | null
+          desconto?: number
           diarias?: number
           id?: string
           pagamento?: string
           pago?: boolean
+          pessoas?: number
           quarto: number
           status?: string
           updated_at?: string
@@ -233,6 +239,7 @@ export type Database = {
           valor_total?: number
         }
         Update: {
+          canal?: string | null
           checkin?: string
           checkin_at?: string | null
           checkout?: string
@@ -240,10 +247,12 @@ export type Database = {
           cliente_nome?: string
           created_at?: string
           created_by?: string | null
+          desconto?: number
           diarias?: number
           id?: string
           pagamento?: string
           pago?: boolean
+          pessoas?: number
           quarto?: number
           status?: string
           updated_at?: string
@@ -275,6 +284,7 @@ export type Database = {
           configuracao: string
           numero: number
           preco: number
+          situacao: string | null
         }
         Insert: {
           andar: number
@@ -282,6 +292,7 @@ export type Database = {
           configuracao: string
           numero: number
           preco?: number
+          situacao?: string | null
         }
         Update: {
           andar?: number
@@ -289,6 +300,7 @@ export type Database = {
           configuracao?: string
           numero?: number
           preco?: number
+          situacao?: string | null
         }
         Relationships: []
       }
