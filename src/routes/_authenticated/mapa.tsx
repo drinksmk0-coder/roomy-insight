@@ -41,6 +41,7 @@ function Mapa() {
   const { data: sales = [] } = useSales();
   const { data: complaints = [] } = useComplaints();
   const insert = useInsert("reservations", ["reservations"]);
+  const updateRoom = useUpdate("rooms", ["rooms"]);
   const [selected, setSelected] = useState<Room | null>(null);
   const [newFor, setNewFor] = useState<number | null>(null);
 
