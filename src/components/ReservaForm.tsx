@@ -166,7 +166,7 @@ export function ReservaForm({
           </Field>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <Field label="Pessoas">
             <input
               type="number"
