@@ -17,11 +17,16 @@ function AuthPage() {
   const [nome, setNome] = useState("");
   const [busy, setBusy] = useState(false);
 
+  async function goToPanel() {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      navigate({ to: "/painel", replace: true });
+    }
+  }
+
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/painel", replace: true });
-    });
-  }, [navigate]);
+    void goToPanel();
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,7 +44,7 @@ function AuthPage() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
         if (error) throw error;
-        navigate({ to: "/painel", replace: true });
+        await goToPanel();
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao autenticar");
@@ -57,7 +62,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/painel", replace: true });
+    await goToPanel();
   }
 
   return (
