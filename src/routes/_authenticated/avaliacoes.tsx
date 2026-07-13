@@ -86,7 +86,7 @@ function Avaliacoes() {
             <select
               value={quartoFiltro}
               onChange={(e) => setQuartoFiltro(e.target.value)}
-              className="input-field h-9 py-0 text-sm"
+              className="field h-9 py-0 text-sm"
             >
               <option value="">Todos os quartos</option>
               {quartos.map((q) => (
@@ -229,7 +229,7 @@ function EditFeedbackModal({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Hóspede">
             <input
-              className="input-field"
+              className="field"
               value={form.hospede_nome ?? ""}
               onChange={(e) => set("hospede_nome", e.target.value)}
             />
@@ -237,7 +237,7 @@ function EditFeedbackModal({
           <Field label="Quarto">
             <input
               type="number"
-              className="input-field"
+              className="field"
               value={form.quarto ?? ""}
               onChange={(e) => set("quarto", e.target.value ? Number(e.target.value) : null)}
             />
@@ -248,7 +248,7 @@ function EditFeedbackModal({
           {CRITERIA.map((c) => (
             <Field key={c.key} label={c.label}>
               <select
-                className="input-field"
+                className="field"
                 value={nota(form[c.key])}
                 onChange={(e) =>
                   set(c.key, e.target.value ? Number(e.target.value) : (null as never))
@@ -276,14 +276,14 @@ function EditFeedbackModal({
 
         <Field label="Comentário">
           <textarea
-            className="input-field min-h-[70px]"
+            className="field min-h-[70px]"
             value={form.comentario ?? ""}
             onChange={(e) => set("comentario", e.target.value)}
           />
         </Field>
         <Field label="Sugestão">
           <textarea
-            className="input-field min-h-[70px]"
+            className="field min-h-[70px]"
             value={form.sugestao ?? ""}
             onChange={(e) => set("sugestao", e.target.value)}
           />
