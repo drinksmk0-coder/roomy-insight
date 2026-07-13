@@ -145,10 +145,19 @@ export function roomStatusToday(
   const active = reservations.filter(
     (r) => r.quarto === numero && r.status !== "cancelado" && r.status !== "finalizado",
   );
-  const occ = active.find((r) => r.checkin <= today && r.checkout > today);
-  // Fully paid stay covering today = ocupado; otherwise reservado.
-  if (occ) return occ.pago || occ.status === "ocupado" ? "ocupado" : "reservado";
-  if (active.length) return "reservado";
+  // A guest who has already checked in (checkin <= hoje) and is fully paid
+  // OR whose reservation is marked "ocupado" keeps the room OCUPADO until the
+  // stay is finalized (checkout) on the reservations page. This is why a paid
+  // room stays red even on/after the checkout date.
+  const occupado = active.find(
+    (r) => r.checkin <= today && (r.pago || r.status === "ocupado"),
+  );
+  if (occupado) return "ocupado";
+  // A stay covering today that is not fully paid = reservado.
+  const occ = active.find((r) => r.checkin <= today && r.checkout >= today);
+  if (occ) return "reservado";
+  // An upcoming booking (starts in the future) keeps the room reserved.
+  if (active.some((r) => r.checkin > today)) return "reservado";
   return "livre";
 }
 
