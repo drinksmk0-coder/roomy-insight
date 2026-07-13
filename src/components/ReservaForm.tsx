@@ -76,6 +76,15 @@ export function ReservaForm({
   const blocked = !!block && !override;
   const status = statusFromPayment(total, valorPago);
 
+  function setPaymentShortcut(amount: number, label: string) {
+    if (!checkout || nights <= 0 || total <= 0) {
+      toast.error("Informe check-in, check-out e valor da diária antes de aplicar pagamento.");
+      return;
+    }
+    setValorPago(Math.min(total, Math.max(0, amount)));
+    toast.success(label);
+  }
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!checkout || nights <= 0) return toast.error("Informe um período válido");
@@ -222,11 +231,15 @@ export function ReservaForm({
           <button
             type="button"
             className="btn-ghost text-xs"
-            onClick={() => setValorPago(Math.round((total / 2) * 100) / 100)}
+            onClick={() => setPaymentShortcut(Math.round((total / 2) * 100) / 100, "Metade do valor aplicada")}
           >
             Pagar metade (reserva)
           </button>
-          <button type="button" className="btn-ghost text-xs" onClick={() => setValorPago(total)}>
+          <button
+            type="button"
+            className="btn-ghost text-xs"
+            onClick={() => setPaymentShortcut(total, "Pagamento total aplicado")}
+          >
             Pagar total (ocupado)
           </button>
         </div>

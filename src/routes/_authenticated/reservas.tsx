@@ -255,10 +255,20 @@ function RowActions({
           <button
             className="rounded-md bg-brass-bg px-2 py-1 text-xs font-semibold text-[oklch(0.4_0.06_74)]"
             onClick={() =>
-              update.mutate({
-                id: reservation.id,
-                patch: { valor_pago: Math.round((total / 2) * 100) / 100, status: "reservado" },
-              })
+              update.mutate(
+                {
+                  id: reservation.id,
+                  patch: {
+                    valor_pago: Math.round((total / 2) * 100) / 100,
+                    pago: false,
+                    status: "reservado",
+                  },
+                },
+                {
+                  onSuccess: () => toast.success("Sinal registrado"),
+                  onError: (e) => toast.error(e.message),
+                },
+              )
             }
           >
             Sinal
@@ -266,15 +276,21 @@ function RowActions({
           <button
             className="rounded-md bg-sage-bg px-2 py-1 text-xs font-semibold text-pine-dark"
             onClick={() =>
-              update.mutate({
-                id: reservation.id,
-                patch: {
-                  valor_pago: total,
-                  pago: true,
-                  status: "ocupado",
-                  checkin_at: reservation.checkin_at ?? new Date().toISOString(),
+              update.mutate(
+                {
+                  id: reservation.id,
+                  patch: {
+                    valor_pago: total,
+                    pago: true,
+                    status: "ocupado",
+                    checkin_at: reservation.checkin_at ?? new Date().toISOString(),
+                  },
                 },
-              })
+                {
+                  onSuccess: () => toast.success("Pagamento total registrado"),
+                  onError: (e) => toast.error(e.message),
+                },
+              )
             }
           >
             Pagar total
@@ -285,10 +301,16 @@ function RowActions({
         <button
           className="rounded-md bg-brick-bg px-2 py-1 text-xs font-semibold text-brick"
           onClick={() =>
-            update.mutate({
-              id: reservation.id,
-              patch: { status: "ocupado", checkin_at: reservation.checkin_at ?? new Date().toISOString() },
-            })
+            update.mutate(
+              {
+                id: reservation.id,
+                patch: { status: "ocupado", checkin_at: reservation.checkin_at ?? new Date().toISOString() },
+              },
+              {
+                onSuccess: () => toast.success("Check-in realizado"),
+                onError: (e) => toast.error(e.message),
+              },
+            )
           }
         >
           Check-in
@@ -297,7 +319,15 @@ function RowActions({
       {reservation.status === "ocupado" && (
         <button
           className="rounded-md bg-slate-bg px-2 py-1 text-xs font-semibold text-slate"
-          onClick={() => update.mutate({ id: reservation.id, patch: { status: "finalizado" } })}
+          onClick={() =>
+            update.mutate(
+              { id: reservation.id, patch: { status: "finalizado" } },
+              {
+                onSuccess: () => toast.success("Check-out realizado"),
+                onError: (e) => toast.error(e.message),
+              },
+            )
+          }
         >
           Check-out
         </button>

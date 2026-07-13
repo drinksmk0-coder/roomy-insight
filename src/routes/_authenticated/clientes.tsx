@@ -32,7 +32,8 @@ function Clientes() {
     (c) =>
       c.nome.toLowerCase().includes(q.toLowerCase()) ||
       (c.telefone ?? "").includes(q) ||
-      (c.documento ?? "").includes(q),
+      (c.documento ?? "").includes(q) ||
+      (c.cpf ?? "").includes(q),
   );
 
   function exportCSV() {
@@ -111,6 +112,7 @@ function Clientes() {
 
       {open && (
         <ClientForm
+          clients={clients}
           onClose={() => setOpen(false)}
           onSave={(row) =>
             insert.mutate(row, {
@@ -128,9 +130,11 @@ function Clientes() {
 }
 
 function ClientForm({
+  clients,
   onClose,
   onSave,
 }: {
+  clients: Client[];
   onClose: () => void;
   onSave: (
     row: Pick<
@@ -148,11 +152,20 @@ function ClientForm({
   const [cidade, setCidade] = useState("");
   const [estado, setEstado] = useState("");
 
+  const cpfDigits = onlyDigits(cpf);
+  const cpfJaCadastrado =
+    cpfDigits.length > 0 &&
+    clients.some((client) => client.cpf && onlyDigits(client.cpf) === cpfDigits);
+
   return (
     <Modal open onClose={onClose} title="Novo cliente">
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          if (cpfJaCadastrado) {
+            toast.error("Este CPF já está cadastrado.");
+            return;
+          }
           onSave({
             nome: nome.trim(),
             tipo,
@@ -186,7 +199,16 @@ function ClientForm({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="CPF">
-            <input className="field" value={cpf} onChange={(e) => setCpf(e.target.value)} maxLength={14} />
+            <input
+              className="field"
+              value={cpf}
+              onChange={(e) => setCpf(e.target.value)}
+              maxLength={14}
+              aria-invalid={cpfJaCadastrado}
+            />
+            {cpfJaCadastrado && (
+              <p className="mt-1 text-xs font-semibold text-brick">Este CPF já está cadastrado.</p>
+            )}
           </Field>
           <Field label="Data de nascimento">
             <input type="date" className="field" value={nascimento} onChange={(e) => setNascimento(e.target.value)} />
@@ -217,11 +239,15 @@ function ClientForm({
           <button type="button" onClick={onClose} className="btn-ghost">
             Cancelar
           </button>
-          <button type="submit" className="btn-primary">
+          <button type="submit" className="btn-primary" disabled={cpfJaCadastrado}>
             Salvar
           </button>
         </div>
       </form>
     </Modal>
   );
+}
+
+function onlyDigits(value: string) {
+  return value.replace(/\D/g, "");
 }
