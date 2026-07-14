@@ -8,6 +8,7 @@ export const Route = createFileRoute("/avaliar")({
   ssr: false,
   validateSearch: (s: Record<string, unknown>) => ({
     quarto: s.quarto != null ? Number(s.quarto) : undefined,
+    empresa: s.empresa != null ? String(s.empresa) : undefined,
   }),
   component: Avaliar,
 });
