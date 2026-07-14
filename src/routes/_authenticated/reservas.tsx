@@ -14,7 +14,7 @@ import {
   roomBlock,
   type Reservation,
 } from "@/lib/data";
-import { fmtBRL, fmtDate, todayISO, downloadCSV } from "@/lib/format";
+import { fmtBRL, fmtDate, fmtTime, todayISO, downloadCSV } from "@/lib/format";
 import { ROOM_BLOCK_REASONS, complaintLabel } from "@/lib/constants";
 import { PageHeader } from "@/components/AppLayout";
 import { Modal, Field, Badge, EmptyState } from "@/components/ui-kit";
@@ -58,7 +58,10 @@ function Reservas() {
         "Quarto",
         "Cliente",
         "Check-in",
+        "Horário check-in",
         "Check-out",
+        "Horário check-out",
+        "Horário da reserva",
         "Diárias",
         "Pessoas",
         "Valor diária",
@@ -73,7 +76,10 @@ function Reservas() {
         r.quarto,
         r.cliente_nome,
         r.checkin,
+        fmtTime(r.horario_checkin),
         r.checkout,
+        fmtTime(r.horario_checkout),
+        fmtTime(r.horario_reserva),
         r.diarias,
         r.pessoas,
         r.valor_diaria,
@@ -138,7 +144,8 @@ function Reservas() {
                   <td className="p-3 font-serif text-lg font-bold">{r.quarto}</td>
                   <td className="p-3">{r.cliente_nome}</td>
                   <td className="p-3 text-muted-foreground">
-                    {fmtDate(r.checkin)} → {fmtDate(r.checkout)}
+                    {fmtDate(r.checkin)} {fmtTime(r.horario_checkin)} → {fmtDate(r.checkout)}{" "}
+                    {fmtTime(r.horario_checkout)}
                   </td>
                   <td className="p-3">
                     <div>{fmtBRL(r.valor_pago)} / {fmtBRL(r.valor_total)}</div>

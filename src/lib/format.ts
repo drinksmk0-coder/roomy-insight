@@ -10,6 +10,11 @@ export function fmtDate(iso: string | null | undefined): string {
   return `${d}/${m}/${y}`;
 }
 
+export function fmtTime(value: string | null | undefined): string {
+  if (!value) return "--:--";
+  return value.slice(0, 5);
+}
+
 export function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }

@@ -20,6 +20,7 @@ import {
   useSales,
   useComplaints,
   useFeedbacks,
+  useExpenses,
   roomStatusToday,
   type Reservation,
   type Sale,
@@ -41,6 +42,7 @@ function Painel() {
   const { data: sales = [] } = useSales();
   const { data: complaints = [] } = useComplaints();
   const { data: feedbacks = [] } = useFeedbacks();
+  const { data: expenses = [] } = useExpenses();
 
   const statuses = rooms.map((r) => roomStatusToday(reservations, r.numero, today));
   const ocupados = statuses.filter((s) => s === "ocupado").length;
@@ -57,6 +59,26 @@ function Painel() {
   const aReceber = reservations
     .filter((r) => !r.pago && r.status !== "cancelado" && r.status !== "finalizado")
     .reduce((s, r) => s + (Number(r.valor_total) - Number(r.valor_pago)), 0);
+
+  const despesasMes = expenses
+    .filter((e) => (e.data || "").slice(0, 7) === month)
+    .reduce((s, e) => s + Number(e.valor), 0);
+  const margemMes = receitaMes - despesasMes;
+  const activeToday = reservations.filter(
+    (r) =>
+      r.status !== "cancelado" &&
+      r.status !== "finalizado" &&
+      r.status !== "manutencao" &&
+      r.checkin <= today &&
+      r.checkout >= today,
+  );
+  const ocupantesHoje = activeToday.reduce((sum, r) => sum + Number(r.pessoas ?? 1), 0);
+  const capacidadeTotal = rooms.reduce((sum, room) => sum + roomCapacity(room.configuracao), 0);
+  const diariaMedia = reservations.length
+    ? reservations.reduce((sum, r) => sum + Number(r.valor_diaria), 0) / reservations.length
+    : rooms.length
+      ? rooms.reduce((sum, r) => sum + Number(r.preco), 0) / rooms.length
+      : 0;
 
   const abertas = complaints.filter((c) => c.status !== "resolvido");
   const notas = feedbacks.map((f) => f.nota_geral).filter((n): n is number => n != null);
@@ -120,11 +142,17 @@ function Painel() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-7">
         <Stat icon={<BedDouble />} label="Ocupação hoje" value={`${ocupacao}%`} hint={`${ocupados} ocupados · ${reservados} reservados · ${livres} livres`} />
         <Stat icon={<DollarSign />} label="Receita do mês" value={fmtBRL(receitaMes)} hint={`A receber: ${fmtBRL(aReceber)}`} />
         <Stat icon={<MessageSquareWarning />} label="Reclamações abertas" value={String(abertas.length)} hint={`${wifiCount} sobre Wi-Fi`} />
         <Stat icon={<Star />} label="Avaliação média" value={media ? media.toFixed(1) : "—"} hint={`${feedbacks.length} avaliações`} />
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat icon={<DollarSign />} label="Diaria media" value={fmtBRL(diariaMedia)} hint="Reservas e quartos" />
+        <Stat icon={<BedDouble />} label="Ocupantes" value={String(ocupantesHoje)} hint={`Capacidade: ${capacidadeTotal}`} />
+        <Stat icon={<DollarSign />} label="Despesas" value={fmtBRL(despesasMes)} hint={`Margem: ${fmtBRL(margemMes)}`} />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -335,4 +363,15 @@ function mostCommon(arr: string[]): string {
   const m = new Map<string, number>();
   arr.forEach((x) => m.set(x, (m.get(x) ?? 0) + 1));
   return [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+}
+
+function roomCapacity(config: string): number {
+  const numbers = config.match(/\d+/g)?.map(Number) ?? [];
+  if (numbers.length) return Math.max(...numbers);
+  const text = config.toLowerCase();
+  if (text.includes("triplo")) return 3;
+  if (text.includes("quad")) return 4;
+  if (text.includes("famil")) return 5;
+  if (text.includes("duplo") || text.includes("casal")) return 2;
+  return 1;
 }

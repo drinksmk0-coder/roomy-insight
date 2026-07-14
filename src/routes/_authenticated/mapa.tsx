@@ -16,7 +16,7 @@ import {
   roomBlock,
   type Room,
 } from "@/lib/data";
-import { fmtBRL, fmtDate, todayISO } from "@/lib/format";
+import { fmtBRL, fmtDate, fmtTime, todayISO } from "@/lib/format";
 import { complaintLabel } from "@/lib/constants";
 import { PageHeader } from "@/components/AppLayout";
 import { Modal, Badge } from "@/components/ui-kit";
@@ -64,6 +64,14 @@ function Mapa() {
   }, [rooms]);
 
   const maxComplaints = Math.max(1, ...complaintsByRoom.values());
+  const revenueByRoom = useMemo(() => {
+    const m = new Map<number, number>();
+    reservations.forEach((r) => {
+      if (r.status !== "cancelado") m.set(r.quarto, (m.get(r.quarto) ?? 0) + Number(r.valor_total));
+    });
+    sales.forEach((s) => m.set(s.quarto, (m.get(s.quarto) ?? 0) + Number(s.total)));
+    return m;
+  }, [reservations, sales]);
 
   return (
     <div>
@@ -96,6 +104,8 @@ function Mapa() {
                 const n = complaintsByRoom.get(r.numero) ?? 0;
                 const intensity = n / maxComplaints;
                 const blocked = !!roomBlock(complaints, r.numero);
+                const next = futureReservationsForRoom(reservations, r.numero, today)[0];
+                const revenue = revenueByRoom.get(r.numero) ?? 0;
                 return (
                   <button
                     key={r.numero}
@@ -106,6 +116,12 @@ function Mapa() {
                     <div className="font-serif text-lg font-bold">{r.numero}</div>
                     <div className="text-[10px] opacity-80">{fmtBRL(r.preco)}</div>
                     <div className="mt-1 text-[10px] font-semibold">{style.label}</div>
+                    {next && (
+                      <div className="mt-1 text-[9px] leading-tight opacity-90">
+                        {fmtDate(next.checkin)} {fmtTime(next.horario_checkin)}
+                      </div>
+                    )}
+                    {revenue > 0 && <div className="mt-1 text-[9px] font-semibold">{fmtBRL(revenue)}</div>}
                     {n > 0 && (
                       <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brick px-1 text-[9px] font-bold text-white">
                         {n}
@@ -187,8 +203,8 @@ function RoomModal({
   room: Room;
   onClose: () => void;
   reservation: ReturnType<typeof activeReservationForRoom>;
-  futureReservations: { id: string; cliente_nome: string; checkin: string; checkout: string; status: string }[];
-  sales: { id: string; item: string; qtd: number; total: number; reserva_id: string | null }[];
+  futureReservations: ReturnType<typeof futureReservationsForRoom>;
+  sales: { id: string; item: string; qtd: number; total: number; reserva_id: string | null; categoria: string | null }[];
   complaints: { id: string; categoria: string; descricao: string | null; status: string; created_at: string }[];
   onNew: () => void;
   onSituacao: (situacao: string | null) => void;
@@ -238,7 +254,8 @@ function RoomModal({
             <div className="space-y-1 text-sm">
               <p className="font-semibold">{reservation.cliente_nome}</p>
               <p className="text-muted-foreground">
-                {fmtDate(reservation.checkin)} → {fmtDate(reservation.checkout)} · {reservation.diarias} diária(s)
+                {fmtDate(reservation.checkin)} {fmtTime(reservation.horario_checkin)} →{" "}
+                {fmtDate(reservation.checkout)} {fmtTime(reservation.horario_checkout)} · {reservation.diarias} diária(s)
               </p>
               <p>Diárias: {fmtBRL(reservation.valor_total)}</p>
               <p>
@@ -258,7 +275,8 @@ function RoomModal({
               {futureReservations.map((fr) => (
                 <li key={fr.id} className="flex items-center justify-between border-b border-border/60 py-1">
                   <span>
-                    {fr.cliente_nome} · {fmtDate(fr.checkin)} → {fmtDate(fr.checkout)}
+                    {fr.cliente_nome} · {fmtDate(fr.checkin)} {fmtTime(fr.horario_checkin)} →{" "}
+                    {fmtDate(fr.checkout)} {fmtTime(fr.horario_checkout)}
                   </span>
                   <Badge tone="brass">{fr.status}</Badge>
                 </li>

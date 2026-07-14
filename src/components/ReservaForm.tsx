@@ -19,6 +19,9 @@ export type ReservaRow = {
   cliente_nome: string;
   checkin: string;
   checkout: string;
+  horario_reserva: string | null;
+  horario_checkin: string | null;
+  horario_checkout: string | null;
   diarias: number;
   valor_diaria: number;
   valor_total: number;
@@ -57,6 +60,11 @@ export function ReservaForm({
   const [nome, setNome] = useState(editing && !editing.cliente_id ? editing.cliente_nome : "");
   const [checkin, setCheckin] = useState(editing?.checkin ?? todayISO());
   const [checkout, setCheckout] = useState(editing?.checkout ?? "");
+  const [horarioReserva, setHorarioReserva] = useState(
+    editing?.horario_reserva?.slice(0, 5) ?? new Date().toTimeString().slice(0, 5),
+  );
+  const [horarioCheckin, setHorarioCheckin] = useState(editing?.horario_checkin?.slice(0, 5) ?? "14:00");
+  const [horarioCheckout, setHorarioCheckout] = useState(editing?.horario_checkout?.slice(0, 5) ?? "12:00");
   const [valorDiaria, setValorDiaria] = useState<number>(
     editing?.valor_diaria ?? rooms.find((r) => r.numero === initRoom)?.preco ?? 0,
   );
@@ -98,6 +106,9 @@ export function ReservaForm({
       cliente_nome: cli?.nome ?? nome.trim(),
       checkin,
       checkout,
+      horario_reserva: horarioReserva || null,
+      horario_checkin: horarioCheckin || null,
+      horario_checkout: horarioCheckout || null,
       diarias: nights,
       valor_diaria: valorDiaria,
       valor_total: total,
@@ -172,6 +183,33 @@ export function ReservaForm({
           </Field>
           <Field label="Check-out">
             <input type="date" className="field" value={checkout} onChange={(e) => setCheckout(e.target.value)} required />
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <Field label="Horário da reserva">
+            <input
+              type="time"
+              className="field"
+              value={horarioReserva}
+              onChange={(e) => setHorarioReserva(e.target.value)}
+            />
+          </Field>
+          <Field label="Horário do check-in">
+            <input
+              type="time"
+              className="field"
+              value={horarioCheckin}
+              onChange={(e) => setHorarioCheckin(e.target.value)}
+            />
+          </Field>
+          <Field label="Horário do check-out">
+            <input
+              type="time"
+              className="field"
+              value={horarioCheckout}
+              onChange={(e) => setHorarioCheckout(e.target.value)}
+            />
           </Field>
         </div>
 

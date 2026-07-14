@@ -38,12 +38,11 @@ function Avaliar() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!notas.nota_geral) return toast.error("Dê ao menos a nota geral");
-    if (!empresa) return toast.error("Link inválido: empresa não informada. Peça o QR Code correto na recepção.");
     setBusy(true);
     const q = quartoInput ? Number(quartoInput) : null;
     try {
       const { error } = await supabase.from("feedbacks").insert({
-        company_id: empresa,
+        company_id: empresa ?? null,
         hospede_nome: nome.trim() || null,
         quarto: q,
         nota_geral: notas.nota_geral ?? null,
@@ -57,12 +56,12 @@ function Avaliar() {
         wifi_dispositivo: wifiProblema && wifiDispositivo ? wifiDispositivo : null,
         comentario: comentario.trim() || null,
         sugestao: sugestao.trim() || null,
-      });
+      } as never);
       if (error) throw error;
 
       if (wifiProblema) {
         await supabase.from("complaints").insert({
-          company_id: empresa,
+          company_id: empresa ?? null,
           quarto: q,
           categoria: "wifi",
           gravidade: "media",
@@ -71,7 +70,7 @@ function Avaliar() {
           dispositivo: wifiProblema && wifiDispositivo ? wifiDispositivo : null,
           descricao: "Problema de Wi-Fi relatado na avaliação do hóspede.",
           status: "aberto",
-        });
+        } as never);
       }
       setSent(true);
     } catch {

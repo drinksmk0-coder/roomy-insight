@@ -2,8 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { Printer } from "lucide-react";
-import { useRooms } from "@/lib/data";
-import { useCurrentCompanyId } from "@/hooks/use-company";
+import { useCurrentCompany, useRooms } from "@/lib/data";
 import { fmtBRL } from "@/lib/format";
 import { PageHeader } from "@/components/AppLayout";
 
@@ -13,17 +12,18 @@ export const Route = createFileRoute("/_authenticated/qrcodes")({
 
 function QrCodes() {
   const { data: rooms = [] } = useRooms();
-  const companyId = useCurrentCompanyId();
+  const current = useCurrentCompany();
   const [codes, setCodes] = useState<Record<number, string>>({});
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   const urls = useMemo(
     () =>
       rooms.reduce<Record<number, string>>((acc, r) => {
-        acc[r.numero] = `${origin}/avaliar?quarto=${r.numero}&empresa=${companyId ?? ""}`;
+        const empresa = current.data?.id ? `&empresa=${current.data.id}` : "";
+        acc[r.numero] = `${origin}/avaliar?quarto=${r.numero}${empresa}`;
         return acc;
       }, {}),
-    [rooms, origin, companyId],
+    [rooms, origin, current.data?.id],
   );
 
   useEffect(() => {

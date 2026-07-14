@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -11,10 +10,8 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [nome, setNome] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function goToPanel() {
@@ -32,20 +29,9 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password: senha,
-          options: { emailRedirectTo: window.location.origin, data: { nome } },
-        });
-        if (error) throw error;
-        toast.success("Conta criada! Você já pode entrar.");
-        setMode("login");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
-        if (error) throw error;
-        await goToPanel();
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
+      if (error) throw error;
+      await goToPanel();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao autenticar");
     } finally {
@@ -54,15 +40,18 @@ function AuthPage() {
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/painel`,
+        queryParams: { prompt: "select_account" },
+      },
     });
-    if (result.error) {
+    if (error) {
+      setBusy(false);
       toast.error("Não foi possível entrar com Google");
-      return;
     }
-    if (result.redirected) return;
-    await goToPanel();
   }
 
   return (
@@ -76,32 +65,7 @@ function AuthPage() {
           <p className="text-sm text-[#CFE0D5]">Painel de operação da equipe</p>
         </div>
         <div className="card-surface p-6">
-          <div className="mb-4 flex rounded-lg bg-muted p-1 text-sm font-semibold">
-            <button
-              onClick={() => setMode("login")}
-              className={`flex-1 rounded-md py-2 transition ${mode === "login" ? "bg-card shadow-sm text-pine-dark" : "text-muted-foreground"}`}
-            >
-              Entrar
-            </button>
-            <button
-              onClick={() => setMode("signup")}
-              className={`flex-1 rounded-md py-2 transition ${mode === "signup" ? "bg-card shadow-sm text-pine-dark" : "text-muted-foreground"}`}
-            >
-              Criar conta
-            </button>
-          </div>
           <form onSubmit={submit} className="space-y-3">
-            {mode === "signup" && (
-              <Field label="Nome">
-                <input
-                  className="field"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  required
-                  maxLength={80}
-                />
-              </Field>
-            )}
             <Field label="E-mail">
               <input
                 type="email"
@@ -127,7 +91,7 @@ function AuthPage() {
               disabled={busy}
               className="w-full rounded-lg bg-pine py-2.5 font-semibold text-primary-foreground transition hover:bg-pine-dark disabled:opacity-60"
             >
-              {busy ? "Aguarde…" : mode === "login" ? "Entrar" : "Criar conta"}
+              {busy ? "Aguarde…" : "Entrar"}
             </button>
           </form>
           <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
@@ -135,6 +99,7 @@ function AuthPage() {
           </div>
           <button
             onClick={google}
+            disabled={busy}
             className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card py-2.5 font-semibold transition hover:bg-muted"
           >
             <svg width="18" height="18" viewBox="0 0 48 48">
@@ -145,10 +110,12 @@ function AuthPage() {
             </svg>
             Continuar com Google
           </button>
+          <div className="mt-4 text-center">
+            <a href="/cadastro-empresa" className="text-sm font-semibold text-pine hover:underline">
+              Criar conta para minha empresa
+            </a>
+          </div>
         </div>
-        <p className="mt-4 text-center text-xs text-[#CFE0D5]">
-          O primeiro cadastro vira o <strong>dono</strong> (acesso total).
-        </p>
       </div>
     </div>
   );

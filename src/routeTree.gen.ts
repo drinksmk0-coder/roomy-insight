@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ImprimirRouteImport } from './routes/imprimir'
+import { Route as CadastroEmpresaRouteImport } from './routes/cadastro-empresa'
 import { Route as AvaliarRouteImport } from './routes/avaliar'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -21,6 +22,10 @@ import { Route as AuthenticatedReclamacoesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedQrcodesRouteImport } from './routes/_authenticated/qrcodes'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
+import { Route as AuthenticatedIntegracoesRouteImport } from './routes/_authenticated/integracoes'
+import { Route as AuthenticatedEquipeRouteImport } from './routes/_authenticated/equipe'
+import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
+import { Route as AuthenticatedDespesasRouteImport } from './routes/_authenticated/despesas'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedAvaliacoesRouteImport } from './routes/_authenticated/avaliacoes'
 
@@ -32,6 +37,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ImprimirRoute = ImprimirRouteImport.update({
   id: '/imprimir',
   path: '/imprimir',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroEmpresaRoute = CadastroEmpresaRouteImport.update({
+  id: '/cadastro-empresa',
+  path: '/cadastro-empresa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AvaliarRoute = AvaliarRouteImport.update({
@@ -84,6 +94,27 @@ const AuthenticatedMapaRoute = AuthenticatedMapaRouteImport.update({
   path: '/mapa',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIntegracoesRoute =
+  AuthenticatedIntegracoesRouteImport.update({
+    id: '/integracoes',
+    path: '/integracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEquipeRoute = AuthenticatedEquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEmpresaRoute = AuthenticatedEmpresaRouteImport.update({
+  id: '/empresa',
+  path: '/empresa',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDespesasRoute = AuthenticatedDespesasRouteImport.update({
+  id: '/despesas',
+  path: '/despesas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
   id: '/clientes',
   path: '/clientes',
@@ -99,10 +130,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/avaliar': typeof AvaliarRoute
+  '/cadastro-empresa': typeof CadastroEmpresaRoute
   '/imprimir': typeof ImprimirRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/avaliacoes': typeof AuthenticatedAvaliacoesRoute
   '/clientes': typeof AuthenticatedClientesRoute
+  '/despesas': typeof AuthenticatedDespesasRoute
+  '/empresa': typeof AuthenticatedEmpresaRoute
+  '/equipe': typeof AuthenticatedEquipeRoute
+  '/integracoes': typeof AuthenticatedIntegracoesRoute
   '/mapa': typeof AuthenticatedMapaRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/qrcodes': typeof AuthenticatedQrcodesRoute
@@ -114,10 +150,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/avaliar': typeof AvaliarRoute
+  '/cadastro-empresa': typeof CadastroEmpresaRoute
   '/imprimir': typeof ImprimirRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/avaliacoes': typeof AuthenticatedAvaliacoesRoute
   '/clientes': typeof AuthenticatedClientesRoute
+  '/despesas': typeof AuthenticatedDespesasRoute
+  '/empresa': typeof AuthenticatedEmpresaRoute
+  '/equipe': typeof AuthenticatedEquipeRoute
+  '/integracoes': typeof AuthenticatedIntegracoesRoute
   '/mapa': typeof AuthenticatedMapaRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/qrcodes': typeof AuthenticatedQrcodesRoute
@@ -131,10 +172,15 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/avaliar': typeof AvaliarRoute
+  '/cadastro-empresa': typeof CadastroEmpresaRoute
   '/imprimir': typeof ImprimirRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/avaliacoes': typeof AuthenticatedAvaliacoesRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
+  '/_authenticated/despesas': typeof AuthenticatedDespesasRoute
+  '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
+  '/_authenticated/equipe': typeof AuthenticatedEquipeRoute
+  '/_authenticated/integracoes': typeof AuthenticatedIntegracoesRoute
   '/_authenticated/mapa': typeof AuthenticatedMapaRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/qrcodes': typeof AuthenticatedQrcodesRoute
@@ -148,10 +194,15 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/avaliar'
+    | '/cadastro-empresa'
     | '/imprimir'
     | '/sitemap.xml'
     | '/avaliacoes'
     | '/clientes'
+    | '/despesas'
+    | '/empresa'
+    | '/equipe'
+    | '/integracoes'
     | '/mapa'
     | '/painel'
     | '/qrcodes'
@@ -163,10 +214,15 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/avaliar'
+    | '/cadastro-empresa'
     | '/imprimir'
     | '/sitemap.xml'
     | '/avaliacoes'
     | '/clientes'
+    | '/despesas'
+    | '/empresa'
+    | '/equipe'
+    | '/integracoes'
     | '/mapa'
     | '/painel'
     | '/qrcodes'
@@ -179,10 +235,15 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/avaliar'
+    | '/cadastro-empresa'
     | '/imprimir'
     | '/sitemap.xml'
     | '/_authenticated/avaliacoes'
     | '/_authenticated/clientes'
+    | '/_authenticated/despesas'
+    | '/_authenticated/empresa'
+    | '/_authenticated/equipe'
+    | '/_authenticated/integracoes'
     | '/_authenticated/mapa'
     | '/_authenticated/painel'
     | '/_authenticated/qrcodes'
@@ -196,6 +257,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   AvaliarRoute: typeof AvaliarRoute
+  CadastroEmpresaRoute: typeof CadastroEmpresaRoute
   ImprimirRoute: typeof ImprimirRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
@@ -214,6 +276,13 @@ declare module '@tanstack/react-router' {
       path: '/imprimir'
       fullPath: '/imprimir'
       preLoaderRoute: typeof ImprimirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro-empresa': {
+      id: '/cadastro-empresa'
+      path: '/cadastro-empresa'
+      fullPath: '/cadastro-empresa'
+      preLoaderRoute: typeof CadastroEmpresaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/avaliar': {
@@ -286,6 +355,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/integracoes': {
+      id: '/_authenticated/integracoes'
+      path: '/integracoes'
+      fullPath: '/integracoes'
+      preLoaderRoute: typeof AuthenticatedIntegracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/equipe': {
+      id: '/_authenticated/equipe'
+      path: '/equipe'
+      fullPath: '/equipe'
+      preLoaderRoute: typeof AuthenticatedEquipeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/empresa': {
+      id: '/_authenticated/empresa'
+      path: '/empresa'
+      fullPath: '/empresa'
+      preLoaderRoute: typeof AuthenticatedEmpresaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/despesas': {
+      id: '/_authenticated/despesas'
+      path: '/despesas'
+      fullPath: '/despesas'
+      preLoaderRoute: typeof AuthenticatedDespesasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/clientes': {
       id: '/_authenticated/clientes'
       path: '/clientes'
@@ -306,6 +403,10 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAvaliacoesRoute: typeof AuthenticatedAvaliacoesRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
+  AuthenticatedDespesasRoute: typeof AuthenticatedDespesasRoute
+  AuthenticatedEmpresaRoute: typeof AuthenticatedEmpresaRoute
+  AuthenticatedEquipeRoute: typeof AuthenticatedEquipeRoute
+  AuthenticatedIntegracoesRoute: typeof AuthenticatedIntegracoesRoute
   AuthenticatedMapaRoute: typeof AuthenticatedMapaRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedQrcodesRoute: typeof AuthenticatedQrcodesRoute
@@ -317,6 +418,10 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAvaliacoesRoute: AuthenticatedAvaliacoesRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
+  AuthenticatedDespesasRoute: AuthenticatedDespesasRoute,
+  AuthenticatedEmpresaRoute: AuthenticatedEmpresaRoute,
+  AuthenticatedEquipeRoute: AuthenticatedEquipeRoute,
+  AuthenticatedIntegracoesRoute: AuthenticatedIntegracoesRoute,
   AuthenticatedMapaRoute: AuthenticatedMapaRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedQrcodesRoute: AuthenticatedQrcodesRoute,
@@ -333,9 +438,20 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   AvaliarRoute: AvaliarRoute,
+  CadastroEmpresaRoute: CadastroEmpresaRoute,
   ImprimirRoute: ImprimirRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
