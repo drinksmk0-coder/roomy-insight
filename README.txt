@@ -1,32 +1,533 @@
-SITE HOTEL REAL CRUZILIA
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Real Cruzília | Centro de Cruzília, MG</title>
+<meta name="description" content="Hotel Real, no centro de Cruzília - MG. Quartos confortáveis, café da manhã mineiro e estacionamento. Reserve pelo WhatsApp.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/assets/hotel-real-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wall:#F1ECDC;
+    --wall-deep:#e7dfc7;
+    --pine:#1F3A2E;
+    --pine-deep:#152A21;
+    --brick:#A6432A;
+    --brick-deep:#8a3620;
+    --gold:#BE9A34;
+    --ink:#241F19;
+    --paper:#FBF8F0;
+    --line: rgba(36,31,25,0.14);
+    --shadow: 0 20px 40px -20px rgba(21,42,33,0.35);
+    --radius: 4px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter', sans-serif;
+    background:var(--wall);
+    color:var(--ink);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.serif{ font-family:'Fraunces', serif; }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--brick);
+    font-weight:600;
+  }
+  a{ color:inherit; text-decoration:none; }
+  img,svg{ display:block; max-width:100%; }
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 28px; }
+  section{ position:relative; }
 
-Arquivos principais:
-- index.html
-- styles.css
-- assets/cruzilia-1.jpg
-- assets/cruzilia-2.jpg
+  /* ---------- Skyline motif (signature element) ---------- */
+  .skyline{ display:block; width:100%; height:auto; }
+  .skyline path, .skyline rect, .skyline circle{ }
+  .divider{ width:100%; height:44px; overflow:hidden; line-height:0; }
+  .divider svg{ width:100%; height:100%; }
 
-Importante:
-1. O Booking bloqueou a captura automatica das fotos especificas do hotel.
-   Por isso, o site usa fotos oficiais de Cruzilia do portal Minas Gerais / Acervo Prefeitura de Cruzilia.
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:100;
+    background:rgba(251,248,240,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px; max-width:1120px; margin:0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-logo{ width:48px; height:48px; object-fit:contain; flex-shrink:0; border-radius:3px; background:var(--paper); }
+  .brand-mark{ width:34px; height:34px; flex-shrink:0; }
+  .brand span{ font-size:1.28rem; font-weight:600; letter-spacing:0.01em; }
+  .brand small{ display:block; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.14em; color:var(--pine); text-transform:uppercase; margin-top:-2px;}
+  nav.links{ display:flex; align-items:center; gap:32px; }
+  nav.links a{ font-size:0.92rem; font-weight:500; color:var(--pine-deep); position:relative; padding:4px 0; }
+  nav.links a::after{
+    content:''; position:absolute; left:0; bottom:0; width:0; height:2px; background:var(--brick);
+    transition:width .25s ease;
+  }
+  nav.links a:hover::after{ width:100%; }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:11px 20px; border-radius:var(--radius);
+    font-weight:600; font-size:0.9rem;
+    border:1px solid transparent;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .btn-primary{ background:var(--brick); color:var(--paper); box-shadow: var(--shadow); }
+  .btn-primary:hover{ transform:translateY(-2px); background:var(--brick-deep); }
+  .btn-outline{ border-color:var(--pine-deep); color:var(--pine-deep); }
+  .btn-outline:hover{ background:var(--pine-deep); color:var(--paper); }
+  .btn-ghost-light{ border-color: rgba(251,248,240,0.4); color:var(--paper); }
+  .btn-ghost-light:hover{ background:rgba(251,248,240,0.12); }
+  .menu-toggle{ display:none; }
 
-2. Para colocar as fotos reais do hotel:
-   - Substitua os blocos "Foto oficial do quarto" no index.html por imagens:
-     <img src="assets/nome-da-foto.jpg" alt="Quarto do Hotel Real Cruzilia">
-   - Coloque os arquivos de imagem dentro da pasta assets.
+  /* ---------- Hero ---------- */
+  .hero{
+    background: linear-gradient(180deg, var(--pine-deep) 0%, var(--pine) 62%, #2c4d3c 100%);
+    color:var(--paper);
+    padding:96px 0 0;
+    position:relative;
+  }
+  .hero .wrap{
+    display:grid; grid-template-columns: 1.15fr 0.85fr; gap:48px; align-items:center;
+    padding-bottom:64px;
+  }
+  .hero .eyebrow{ color:#E7C568; }
+  .hero h1{
+    font-size:clamp(2.6rem, 5.4vw, 4.2rem);
+    font-weight:600;
+    line-height:1.04;
+    margin:14px 0 20px;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 em{ font-style:italic; font-weight:500; color:#E7C568; }
+  .hero p.lede{ font-size:1.08rem; color:rgba(251,248,240,0.82); max-width:46ch; margin-bottom:32px; }
+  .hero .cta-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .hero-badge-col{ position:relative; }
+  .hero-card{
+    background: rgba(251,248,240,0.06);
+    border:1px solid rgba(251,248,240,0.22);
+    border-radius:8px;
+    padding:28px;
+    backdrop-filter:blur(3px);
+  }
+  .hero-stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:6px;}
+  .hero-stat b{ display:block; font-family:'Fraunces',serif; font-size:2.1rem; font-weight:600; color:#E7C568; line-height:1; }
+  .hero-stat span{ font-size:0.78rem; color:rgba(251,248,240,0.7); }
+  .hero-illustration{ width:100%; margin-top:8px; opacity:0.95;}
 
-3. Para configurar o WhatsApp:
-   - Procure por 5535999999999 no index.html.
-   - Troque pelo numero oficial com DDI e DDD.
-   - Exemplo: se o telefone for (35) 99999-9999, use 5535999999999.
+  /* ---------- About ---------- */
+  .about{ padding:88px 0 72px; background:var(--wall); }
+  .about-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:64px; align-items:start; }
+  .about h2{ font-size:clamp(1.9rem,3vw,2.5rem); font-weight:600; margin:12px 0 22px; }
+  .about p{ color:#3b352c; margin-bottom:16px; max-width:52ch; }
+  .facts{ display:flex; flex-direction:column; gap:0; border-top:1px solid var(--line); margin-top:8px;}
+  .fact{ display:flex; justify-content:space-between; padding:16px 0; border-bottom:1px solid var(--line); }
+  .fact b{ font-family:'Fraunces',serif; font-weight:600; font-size:1.05rem; }
+  .fact span{ font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--brick); text-transform:uppercase; letter-spacing:0.06em; }
 
-Links ja incluidos:
-- Instagram: https://www.instagram.com/hotelrealcruzilia/
-- Booking: https://www.booking.com/hotel/br/real-cruzilia-cruzilia.pt-br.html
-- Google Maps: busca por Hotel Real Cruzilia
+  /* ---------- Amenities ---------- */
+  .amenities{ padding:80px 0; background:var(--paper); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .amenities-head{ max-width:60ch; margin-bottom:44px; }
+  .amenities-head h2{ font-size:clamp(1.9rem,3vw,2.5rem); font-weight:600; margin:12px 0 0;}
+  .grid-amn{ display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  .amn-item{ background:var(--paper); padding:32px 28px; transition:background .2s ease; }
+  .amn-item:hover{ background:var(--wall); }
+  .amn-item svg{ width:26px; height:26px; color:var(--pine-deep); margin-bottom:16px; }
+  .amn-item h3{ font-size:1.02rem; font-weight:600; margin-bottom:6px; font-family:'Inter',sans-serif; }
+  .amn-item p{ font-size:0.88rem; color:#5b5346; }
 
-Como abrir:
-- Clique duas vezes em index.html.
+  /* ---------- Location ---------- */
+  .location{ padding:88px 0; background:var(--wall); }
+  .loc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:stretch; }
+  .loc-map{ border-radius:6px; overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow); min-height:380px; }
+  .loc-map iframe{ width:100%; height:100%; min-height:380px; border:0; display:block; }
+  .loc-info h2{ font-size:clamp(1.9rem,3vw,2.4rem); font-weight:600; margin:12px 0 18px; }
+  .loc-info p{ color:#3b352c; margin-bottom:20px; max-width:48ch; }
+  .addr-block{ display:flex; gap:14px; padding:20px 0; border-top:1px solid var(--line); }
+  .addr-block:last-of-type{ border-bottom:1px solid var(--line); }
+  .addr-block svg{ width:20px; height:20px; flex-shrink:0; margin-top:3px; color:var(--brick); }
+  .addr-block b{ display:block; font-size:0.95rem; margin-bottom:2px; }
+  .addr-block span{ font-size:0.88rem; color:#5b5346; }
+  .loc-cta{ margin-top:28px; display:flex; gap:14px; flex-wrap:wrap; }
 
-Como subir no Vercel:
-- Envie a pasta hotel-real-site ou o ZIP gerado.
+  /* ---------- Reservation request ---------- */
+  .reservation{ padding:88px 0; background:var(--paper); border-top:1px solid var(--line); }
+  .reservation-grid{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:56px; align-items:start; }
+  .reservation h2{ font-size:clamp(1.9rem,3vw,2.5rem); font-weight:600; margin:12px 0 18px; }
+  .reservation p{ color:#4a4238; max-width:48ch; }
+  .reservation-form{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px;
+    border:1px solid var(--line); border-radius:6px; padding:24px; background:#fffdf8;
+    box-shadow:var(--shadow);
+  }
+  .reservation-form label{ display:flex; flex-direction:column; gap:6px; font-size:0.78rem; font-weight:700; color:var(--pine-deep); text-transform:uppercase; letter-spacing:0.04em; }
+  .reservation-form input,.reservation-form textarea{
+    width:100%; border:1px solid var(--line); border-radius:4px; padding:12px 12px;
+    font:inherit; color:var(--ink); background:var(--paper);
+  }
+  .reservation-form textarea{ min-height:96px; resize:vertical; }
+  .reservation-form .full{ grid-column:1 / -1; }
+  .form-status{ grid-column:1 / -1; min-height:22px; font-size:0.9rem; font-weight:600; color:var(--pine); }
+  .form-status.error{ color:var(--brick); }
+
+  /* ---------- Contact / social band ---------- */
+  .contact{
+    background: linear-gradient(180deg, #2c4d3c 0%, var(--pine) 45%, var(--pine-deep) 100%);
+    color:var(--paper);
+    padding:88px 0 64px;
+  }
+  .contact .eyebrow{ color:#E7C568; }
+  .contact h2{ font-size:clamp(2rem,3.6vw,2.8rem); font-weight:600; margin:12px 0 18px; max-width:16ch; }
+  .contact p{ color:rgba(251,248,240,0.78); max-width:48ch; margin-bottom:36px; }
+  .contact-grid{ display:grid; grid-template-columns: 1.1fr 0.9fr; gap:56px; align-items:center; }
+  .social-cards{ display:flex; flex-direction:column; gap:14px; }
+  .social-card{
+    display:flex; align-items:center; gap:16px;
+    padding:18px 20px; border:1px solid rgba(251,248,240,0.22); border-radius:6px;
+    transition: background .2s ease, transform .2s ease, border-color .2s ease;
+  }
+  .social-card:hover{ background:rgba(251,248,240,0.08); transform:translateX(4px); border-color:rgba(251,248,240,0.4); }
+  .social-card svg{ width:24px; height:24px; flex-shrink:0; color:#E7C568; }
+  .social-card b{ display:block; font-size:0.98rem; }
+  .social-card span{ font-size:0.82rem; color:rgba(251,248,240,0.68); }
+
+  /* ---------- Footer ---------- */
+  footer{ background:var(--pine-deep); color:rgba(251,248,240,0.72); padding:36px 0; }
+  .footer-grid{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; font-size:0.82rem; }
+  footer a:hover{ color:var(--paper); }
+
+  /* ---------- Reveal animation ---------- */
+  .reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity:1; transform:none; transition:none; }
+    html{ scroll-behavior:auto; }
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 880px){
+    nav.links{ display:none; }
+    .menu-toggle{ display:flex; }
+    .hero .wrap{ grid-template-columns:1fr; padding-bottom:48px; }
+    .hero{ padding-top:110px; }
+    .about-grid, .loc-grid, .contact-grid{ grid-template-columns:1fr; gap:36px; }
+    .reservation-grid{ grid-template-columns:1fr; gap:32px; }
+    .grid-amn{ grid-template-columns:1fr 1fr; }
+    .footer-grid{ flex-direction:column; align-items:flex-start; }
+  }
+  @media (max-width: 560px){
+    .grid-amn{ grid-template-columns:1fr; }
+    .hero-stat-grid{ grid-template-columns:1fr 1fr; }
+    .reservation-form{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a class="brand" href="#top" aria-label="Hotel Real - início">
+      <img class="brand-logo" src="assets/hotel-real-logo.png" alt="Hotel Real Cruzília MG">
+      <span>Hotel Real<br><small>Cruzília &middot; MG</small></span>
+    </a>
+    <nav class="links">
+      <a href="#sobre">O hotel</a>
+      <a href="#comodidades">Comodidades</a>
+      <a href="#localizacao">Localização</a>
+      <a href="#reserva">Pré-reserva</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <a class="btn btn-primary" href="https://wa.me/553588001372" target="_blank" rel="noopener">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.19c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.8-.11-.42-.13-.95-.31-1.64-.6-2.9-1.25-4.8-4.16-4.94-4.35-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.26-.29.58-.36.77-.36.19 0 .39 0 .55.01.18.01.41-.07.65.49.24.58.82 2 .89 2.15.07.14.11.31.02.5-.1.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.29-.12.56.16.28.71 1.18 1.53 1.91 1.05.94 1.94 1.23 2.21 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.26.14.43.2.5.32.06.11.06.65-.18 1.34z"/></svg>
+      WhatsApp
+    </a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Centro de Cruzília &mdash; Minas Gerais</p>
+      <h1>Descanso simples,<br><em>no coração</em> de Cruzília.</h1>
+      <p class="lede">O Hotel Real recebe viajantes, famílias e visitantes a poucos passos da praça central, da Igreja Matriz e do comércio da cidade &mdash; com o acolhimento de quem trata cada hóspede como visita de casa.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#reserva">Fazer pré-reserva</a>
+        <a class="btn btn-outline" style="border-color:rgba(251,248,240,0.5); color:#FBF8F0;" href="#localizacao">Como chegar</a>
+      </div>
+    </div>
+    <div class="hero-badge-col reveal">
+      <div class="hero-card">
+        <p class="eyebrow" style="color:#E7C568;">Em números</p>
+        <div class="hero-stat-grid">
+          <div class="hero-stat"><b>39</b><span>quartos com conforto caseiro</span></div>
+          <div class="hero-stat"><b>2&#9733;</b><span>categoria, no centro da cidade</span></div>
+          <div class="hero-stat"><b>24h</b><span>estacionamento e recepção</span></div>
+          <div class="hero-stat"><b>5min</b><span>a pé do Museu Casa da Cultura</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="divider">
+    <svg class="skyline" viewBox="0 0 1200 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 90V60 L40 60 L40 40 L60 40 L60 60 L90 60 L90 20 L110 20 L110 60 L160 60 L160 45 L180 45 L180 60
+      L230 60 L230 10 L245 10 L245 4 L260 4 L260 10 L275 10 L275 60 L330 60 L330 50 L350 50 L350 60
+      L420 60 L420 30 L440 30 L440 60 L520 60 L520 15 L535 15 L535 5 L550 5 L550 15 L565 15 L565 60
+      L650 60 L650 45 L670 45 L670 60 L740 60 L740 35 L760 35 L760 60 L830 60 L830 50 L850 50 L850 60
+      L920 60 L920 20 L935 20 L935 8 L950 8 L950 20 L965 20 L965 60 L1040 60 L1040 40 L1060 40 L1060 60
+      L1200 60 V90 Z" fill="#F1ECDC"></path>
+    </svg>
+  </div>
+</section>
+
+<section class="about" id="sobre">
+  <div class="wrap about-grid">
+    <div class="reveal">
+      <p class="eyebrow">O hotel</p>
+      <h2>Tradição hospitaleira na Serra da Mantiqueira</h2>
+      <p>Localizado na Rua Capitão Pinto, bem no centro de Cruzília, o Hotel Real está a uma quadra da praça principal, cercado por padarias, farmácias, mercado e pontos de ônibus &mdash; tudo a pé.</p>
+      <p>São 39 quartos simples e bem cuidados, com banheiro privativo, roupa de cama e toalhas incluídas. Ideal para quem está de passagem para São Tomé das Letras, Itamonte e as trilhas da região, ou a trabalho na cidade.</p>
+      <p>Café da manhã caseiro, à mineira, servido todas as manhãs para começar o dia com energia.</p>
+    </div>
+    <div class="reveal">
+      <div class="facts">
+        <div class="fact"><b>Endereço</b><span>Rua Capitão Pinto, 70</span></div>
+        <div class="fact"><b>Bairro</b><span>Centro &middot; Cruzília, MG</span></div>
+        <div class="fact"><b>CEP</b><span>37445-000</span></div>
+        <div class="fact"><b>Check-in / Check-out</b><span>A combinar na reserva</span></div>
+        <div class="fact"><b>Pagamento</b><span>Consultar formas aceitas</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="amenities" id="comodidades">
+  <div class="wrap">
+    <div class="amenities-head reveal">
+      <p class="eyebrow">Comodidades</p>
+      <h2>Tudo o que uma boa estadia precisa</h2>
+    </div>
+    <div class="grid-amn reveal">
+      <div class="amn-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8.5a15.5 15.5 0 0 1 20 0M5.5 12a10.5 10.5 0 0 1 13 0M9 15.5a5.5 5.5 0 0 1 6 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <h3>Wi-Fi gratuito</h3>
+        <p>Internet sem custo em todo o hotel, para hóspedes a trabalho ou a lazer.</p>
+      </div>
+      <div class="amn-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 10h13a3 3 0 0 1 0 6H4z"/><path d="M4 10v6"/><path d="M7 6c0-1 1-2 1-3M11 6c0-1 1-2 1-3"/></svg>
+        <h3>Café da manhã mineiro</h3>
+        <p>Servido diariamente, com pães, queijos, frutas e quitutes caseiros.</p>
+      </div>
+      <div class="amn-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="18" height="12" rx="1.5"/><circle cx="9" cy="13" r="2"/><path d="M15 10h3M15 14h3"/></svg>
+        <h3>Estacionamento 24h</h3>
+        <p>Vaga coberta e segura para o seu carro durante toda a estadia.</p>
+      </div>
+      <div class="amn-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></svg>
+        <h3>TV de tela plana</h3>
+        <p>Quartos equipados com televisão e mesa de apoio.</p>
+      </div>
+      <div class="amn-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 21V9a2 2 0 0 1 2-2h1V4a2 2 0 0 1 4 0v3h1a2 2 0 0 1 2 2v12"/><path d="M5 21h14"/></svg>
+        <h3>Banheiro privativo</h3>
+        <p>Todos os quartos com chuveiro, toalhas e roupa de cama incluídos.</p>
+      </div>
+      <div class="amn-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3a6 6 0 0 0-6 6c0 4 6 12 6 12s6-8 6-12a6 6 0 0 0-6-6z"/><circle cx="12" cy="9" r="2"/></svg>
+        <h3>Localização central</h3>
+        <p>A poucos passos da praça, do comércio e da Igreja Matriz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="location" id="localizacao">
+  <div class="wrap loc-grid">
+    <div class="loc-map reveal">
+      <iframe
+        src="https://www.google.com/maps?q=Hotel+Real+Cruz%C3%ADlia+MG&output=embed"
+        allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        title="Mapa - Hotel Real Cruzília MG"></iframe>
+    </div>
+    <div class="loc-info reveal">
+      <p class="eyebrow">Como chegar</p>
+      <h2>Fácil de encontrar, no centro de Cruzília</h2>
+      <p>O hotel fica a uma curta caminhada da praça central e da Igreja Matriz, com fácil acesso para quem chega de carro ou de ônibus.</p>
+      <div class="addr-block">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3a6 6 0 0 0-6 6c0 4 6 12 6 12s6-8 6-12a6 6 0 0 0-6-6z"/><circle cx="12" cy="9" r="2"/></svg>
+        <div><b>Endereço</b><span>Rua Capitão Pinto, 70 &mdash; Centro, Cruzília &mdash; MG, 37445-000</span></div>
+      </div>
+      <div class="addr-block">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.35 1.94.68 2.86a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.22-1.25a2 2 0 0 1 2.11-.45c.92.33 1.88.55 2.86.68A2 2 0 0 1 22 16.92z"/></svg>
+        <div><b>Telefone / WhatsApp</b><span>(35) 8800-1372</span></div>
+      </div>
+      <div class="loc-cta">
+        <a class="btn btn-primary" href="https://www.google.com/maps/place/Hotel+Real+-+Cruz%C3%ADlia+MG/@-21.8386626,-44.8279959,15z/data=!4m13!1m2!2m1!1shotel+real!3m9!1s0x9e33011dc47497:0xc1b5e8eeac03717d!5m2!4m1!1i2!8m2!3d-21.8386626!4d-44.8099715!15sCgpob3RlbCByZWFskgEFaG90ZWyqAUIQASoOIgpob3RlbCByZWFsKAwyHhABIhrZq-n4ianVIIvixTLpj0BHElpNmhwl29hKwDIOEAIiCmhvdGVsIHJlYWzgAQA!16s%2Fg%2F11g9dv0qxw?entry=ttu" target="_blank" rel="noopener">Abrir rota no Google Maps</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="reservation" id="reserva">
+  <div class="wrap reservation-grid">
+    <div class="reveal">
+      <p class="eyebrow">Pré-reserva online</p>
+      <h2>Envie seu pedido direto para a recepção</h2>
+      <p>Preencha os dados principais da estadia. A solicitação entra no programa do hotel como evento do site para a equipe confirmar disponibilidade, valor e quarto.</p>
+    </div>
+    <form class="reservation-form reveal" id="reservationForm">
+      <label>Nome completo
+        <input name="nome" autocomplete="name" required>
+      </label>
+      <label>WhatsApp
+        <input name="telefone" inputmode="tel" autocomplete="tel" required>
+      </label>
+      <label>Entrada
+        <input name="checkin" type="date" required>
+      </label>
+      <label>Saída
+        <input name="checkout" type="date" required>
+      </label>
+      <label>Pessoas
+        <input name="pessoas" type="number" min="1" max="8" value="2" required>
+      </label>
+      <label>E-mail
+        <input name="email" type="email" autocomplete="email">
+      </label>
+      <label class="full">Observações
+        <textarea name="observacoes" placeholder="Ex.: quarto casal, garagem, chegada à noite"></textarea>
+      </label>
+      <div class="form-status" id="reservationStatus" role="status" aria-live="polite"></div>
+      <button class="btn btn-primary full" type="submit">Enviar pré-reserva</button>
+    </form>
+  </div>
+</section>
+
+<section class="contact" id="contato">
+  <div class="wrap contact-grid">
+    <div class="reveal">
+      <p class="eyebrow">Fale com a gente</p>
+      <h2>Sua reserva a uma mensagem de distância</h2>
+      <p>Chame no WhatsApp para consultar disponibilidade e valores, ou acompanhe o dia a dia do hotel nas redes sociais.</p>
+      <a class="btn btn-primary" href="https://wa.me/553588001372" target="_blank" rel="noopener">Chamar no WhatsApp</a>
+    </div>
+    <div class="social-cards reveal">
+      <a class="social-card" href="https://wa.me/553588001372" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.19c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.8-.11-.42-.13-.95-.31-1.64-.6-2.9-1.25-4.8-4.16-4.94-4.35-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.26-.29.58-.36.77-.36.19 0 .39 0 .55.01.18.01.41-.07.65.49.24.58.82 2 .89 2.15.07.14.11.31.02.5-.1.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.29-.12.56.16.28.71 1.18 1.53 1.91 1.05.94 1.94 1.23 2.21 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.26.14.43.2.5.32.06.11.06.65-.18 1.34z"/></svg>
+        <div><b>WhatsApp</b><span>(35) 8800-1372 &middot; resposta rápida</span></div>
+      </a>
+      <a class="social-card" href="https://www.instagram.com/hotelrealcruzilia/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>
+        <div><b>Instagram</b><span>@hotelrealcruzilia</span></div>
+      </a>
+      <a class="social-card" href="https://www.facebook.com/hotelrealmg/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 4h-2a4 4 0 0 0-4 4v3H7v4h2v7h4v-7h3l1-4h-4V8a1 1 0 0 1 1-1h3z"/></svg>
+        <div><b>Facebook</b><span>Hotel Real &mdash; Cruzília MG</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-grid">
+    <span>&copy; <span id="year"></span> Hotel Real &mdash; Rua Capitão Pinto, 70, Centro, Cruzília &ndash; MG</span>
+    <span>
+      <a href="https://wa.me/553588001372" target="_blank" rel="noopener">WhatsApp</a> &nbsp;&middot;&nbsp;
+      <a href="https://www.instagram.com/hotelrealcruzilia/" target="_blank" rel="noopener">Instagram</a> &nbsp;&middot;&nbsp;
+      <a href="https://www.facebook.com/hotelrealmg/" target="_blank" rel="noopener">Facebook</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const SUPABASE_URL = 'https://xjdqjjfnpcnywrkxentv.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_UtWRhlI3JrKrc0sHZ_bp5g_xPxDMoMI';
+  const WHATSAPP_URL = 'https://wa.me/553588001372';
+
+  const reservationForm = document.getElementById('reservationForm');
+  const reservationStatus = document.getElementById('reservationStatus');
+
+  reservationForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    reservationStatus.classList.remove('error');
+    reservationStatus.textContent = 'Enviando...';
+
+    const form = new FormData(reservationForm);
+    const payload = {
+      nome: String(form.get('nome') || '').trim(),
+      telefone: String(form.get('telefone') || '').trim(),
+      email: String(form.get('email') || '').trim(),
+      checkin: String(form.get('checkin') || ''),
+      checkout: String(form.get('checkout') || ''),
+      pessoas: Number(form.get('pessoas') || 1),
+      observacoes: String(form.get('observacoes') || '').trim(),
+      origem: 'site_hotel_real',
+      pagina: window.location.href,
+      recebido_em: new Date().toISOString()
+    };
+
+    if (payload.checkout <= payload.checkin) {
+      reservationStatus.classList.add('error');
+      reservationStatus.textContent = 'A data de saída precisa ser depois da entrada.';
+      return;
+    }
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/integration_events`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({
+          source: 'site',
+          external_id: `site-${Date.now()}`,
+          status: 'received',
+          payload
+        })
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+
+      reservationForm.reset();
+      reservationStatus.textContent = 'Pré-reserva enviada. A recepção vai confirmar pelo WhatsApp.';
+    } catch (error) {
+      const text = encodeURIComponent(
+        `Olá, gostaria de fazer uma pré-reserva.\nNome: ${payload.nome}\nTelefone: ${payload.telefone}\nEntrada: ${payload.checkin}\nSaída: ${payload.checkout}\nPessoas: ${payload.pessoas}\nObservações: ${payload.observacoes}`
+      );
+      reservationStatus.classList.add('error');
+      reservationStatus.innerHTML = `Não foi possível enviar automaticamente. <a href="${WHATSAPP_URL}?text=${text}" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>.`;
+    }
+  });
+
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold:0.15 });
+    revealEls.forEach(el=> io.observe(el));
+  } else {
+    revealEls.forEach(el=> el.classList.add('in'));
+  }
+</script>
+
+</body>
+</html>
