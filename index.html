@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hotel Real Cruzília | Centro de Cruzília, MG</title>
 <meta name="description" content="Hotel Real, no centro de Cruzília - MG. Quartos confortáveis, café da manhã mineiro e estacionamento. Reserve pelo WhatsApp.">
+<link rel="icon" type="image/png" href="assets/hotel-real-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -64,6 +65,7 @@
     padding:16px 28px; max-width:1120px; margin:0 auto;
   }
   .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-logo{ width:48px; height:48px; object-fit:contain; flex-shrink:0; border-radius:3px; background:var(--paper); }
   .brand-mark{ width:34px; height:34px; flex-shrink:0; }
   .brand span{ font-size:1.28rem; font-weight:600; letter-spacing:0.01em; }
   .brand small{ display:block; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.14em; color:var(--pine); text-transform:uppercase; margin-top:-2px;}
@@ -159,6 +161,26 @@
   .addr-block span{ font-size:0.88rem; color:#5b5346; }
   .loc-cta{ margin-top:28px; display:flex; gap:14px; flex-wrap:wrap; }
 
+  /* ---------- Reservation request ---------- */
+  .reservation{ padding:88px 0; background:var(--paper); border-top:1px solid var(--line); }
+  .reservation-grid{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:56px; align-items:start; }
+  .reservation h2{ font-size:clamp(1.9rem,3vw,2.5rem); font-weight:600; margin:12px 0 18px; }
+  .reservation p{ color:#4a4238; max-width:48ch; }
+  .reservation-form{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px;
+    border:1px solid var(--line); border-radius:6px; padding:24px; background:#fffdf8;
+    box-shadow:var(--shadow);
+  }
+  .reservation-form label{ display:flex; flex-direction:column; gap:6px; font-size:0.78rem; font-weight:700; color:var(--pine-deep); text-transform:uppercase; letter-spacing:0.04em; }
+  .reservation-form input,.reservation-form textarea{
+    width:100%; border:1px solid var(--line); border-radius:4px; padding:12px 12px;
+    font:inherit; color:var(--ink); background:var(--paper);
+  }
+  .reservation-form textarea{ min-height:96px; resize:vertical; }
+  .reservation-form .full{ grid-column:1 / -1; }
+  .form-status{ grid-column:1 / -1; min-height:22px; font-size:0.9rem; font-weight:600; color:var(--pine); }
+  .form-status.error{ color:var(--brick); }
+
   /* ---------- Contact / social band ---------- */
   .contact{
     background: linear-gradient(180deg, #2c4d3c 0%, var(--pine) 45%, var(--pine-deep) 100%);
@@ -200,12 +222,14 @@
     .hero .wrap{ grid-template-columns:1fr; padding-bottom:48px; }
     .hero{ padding-top:110px; }
     .about-grid, .loc-grid, .contact-grid{ grid-template-columns:1fr; gap:36px; }
+    .reservation-grid{ grid-template-columns:1fr; gap:32px; }
     .grid-amn{ grid-template-columns:1fr 1fr; }
     .footer-grid{ flex-direction:column; align-items:flex-start; }
   }
   @media (max-width: 560px){
     .grid-amn{ grid-template-columns:1fr; }
     .hero-stat-grid{ grid-template-columns:1fr 1fr; }
+    .reservation-form{ grid-template-columns:1fr; }
   }
 </style>
 </head>
@@ -214,19 +238,14 @@
 <header>
   <div class="nav">
     <a class="brand" href="#top" aria-label="Hotel Real - início">
-      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="40" height="40" rx="4" fill="#1F3A2E"/>
-        <path d="M20 8L30 15V32H10V15L20 8Z" stroke="#E7C568" stroke-width="1.6"/>
-        <path d="M20 8V32" stroke="#E7C568" stroke-width="1.2" opacity="0.6"/>
-        <rect x="16" y="21" width="8" height="11" stroke="#E7C568" stroke-width="1.2"/>
-        <circle cx="20" cy="14" r="1.6" fill="#E7C568"/>
-      </svg>
+      <img class="brand-logo" src="assets/hotel-real-logo.png" alt="Hotel Real Cruzília MG">
       <span>Hotel Real<br><small>Cruzília &middot; MG</small></span>
     </a>
     <nav class="links">
       <a href="#sobre">O hotel</a>
       <a href="#comodidades">Comodidades</a>
       <a href="#localizacao">Localização</a>
+      <a href="#reserva">Pré-reserva</a>
       <a href="#contato">Contato</a>
     </nav>
     <a class="btn btn-primary" href="https://wa.me/553588001372" target="_blank" rel="noopener">
@@ -243,7 +262,7 @@
       <h1>Descanso simples,<br><em>no coração</em> de Cruzília.</h1>
       <p class="lede">O Hotel Real recebe viajantes, famílias e visitantes a poucos passos da praça central, da Igreja Matriz e do comércio da cidade &mdash; com o acolhimento de quem trata cada hóspede como visita de casa.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="https://wa.me/553588001372" target="_blank" rel="noopener">Reservar pelo WhatsApp</a>
+        <a class="btn btn-primary" href="#reserva">Fazer pré-reserva</a>
         <a class="btn btn-outline" style="border-color:rgba(251,248,240,0.5); color:#FBF8F0;" href="#localizacao">Como chegar</a>
       </div>
     </div>
@@ -360,6 +379,41 @@
   </div>
 </section>
 
+<section class="reservation" id="reserva">
+  <div class="wrap reservation-grid">
+    <div class="reveal">
+      <p class="eyebrow">Pré-reserva online</p>
+      <h2>Envie seu pedido direto para a recepção</h2>
+      <p>Preencha os dados principais da estadia. A solicitação entra no programa do hotel como evento do site para a equipe confirmar disponibilidade, valor e quarto.</p>
+    </div>
+    <form class="reservation-form reveal" id="reservationForm">
+      <label>Nome completo
+        <input name="nome" autocomplete="name" required>
+      </label>
+      <label>WhatsApp
+        <input name="telefone" inputmode="tel" autocomplete="tel" required>
+      </label>
+      <label>Entrada
+        <input name="checkin" type="date" required>
+      </label>
+      <label>Saída
+        <input name="checkout" type="date" required>
+      </label>
+      <label>Pessoas
+        <input name="pessoas" type="number" min="1" max="8" value="2" required>
+      </label>
+      <label>E-mail
+        <input name="email" type="email" autocomplete="email">
+      </label>
+      <label class="full">Observações
+        <textarea name="observacoes" placeholder="Ex.: quarto casal, garagem, chegada à noite"></textarea>
+      </label>
+      <div class="form-status" id="reservationStatus" role="status" aria-live="polite"></div>
+      <button class="btn btn-primary full" type="submit">Enviar pré-reserva</button>
+    </form>
+  </div>
+</section>
+
 <section class="contact" id="contato">
   <div class="wrap contact-grid">
     <div class="reveal">
@@ -398,6 +452,67 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  const SUPABASE_URL = 'https://xjdqjjfnpcnywrkxentv.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_UtWRhlI3JrKrc0sHZ_bp5g_xPxDMoMI';
+  const WHATSAPP_URL = 'https://wa.me/553588001372';
+
+  const reservationForm = document.getElementById('reservationForm');
+  const reservationStatus = document.getElementById('reservationStatus');
+
+  reservationForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    reservationStatus.classList.remove('error');
+    reservationStatus.textContent = 'Enviando...';
+
+    const form = new FormData(reservationForm);
+    const payload = {
+      nome: String(form.get('nome') || '').trim(),
+      telefone: String(form.get('telefone') || '').trim(),
+      email: String(form.get('email') || '').trim(),
+      checkin: String(form.get('checkin') || ''),
+      checkout: String(form.get('checkout') || ''),
+      pessoas: Number(form.get('pessoas') || 1),
+      observacoes: String(form.get('observacoes') || '').trim(),
+      origem: 'site_hotel_real',
+      pagina: window.location.href,
+      recebido_em: new Date().toISOString()
+    };
+
+    if (payload.checkout <= payload.checkin) {
+      reservationStatus.classList.add('error');
+      reservationStatus.textContent = 'A data de saída precisa ser depois da entrada.';
+      return;
+    }
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/integration_events`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({
+          source: 'site',
+          external_id: `site-${Date.now()}`,
+          status: 'received',
+          payload
+        })
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+
+      reservationForm.reset();
+      reservationStatus.textContent = 'Pré-reserva enviada. A recepção vai confirmar pelo WhatsApp.';
+    } catch (error) {
+      const text = encodeURIComponent(
+        `Olá, gostaria de fazer uma pré-reserva.\nNome: ${payload.nome}\nTelefone: ${payload.telefone}\nEntrada: ${payload.checkin}\nSaída: ${payload.checkout}\nPessoas: ${payload.pessoas}\nObservações: ${payload.observacoes}`
+      );
+      reservationStatus.classList.add('error');
+      reservationStatus.innerHTML = `Não foi possível enviar automaticamente. <a href="${WHATSAPP_URL}?text=${text}" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>.`;
+    }
+  });
 
   const revealEls = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window){
