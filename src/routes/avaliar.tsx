@@ -23,7 +23,7 @@ const CRITERIA = [
 ] as const;
 
 function Avaliar() {
-  const { quarto } = useSearch({ from: "/avaliar" });
+  const { quarto, empresa } = useSearch({ from: "/avaliar" });
   const [nome, setNome] = useState("");
   const [quartoInput, setQuartoInput] = useState<string>(quarto ? String(quarto) : "");
   const [notas, setNotas] = useState<Record<string, number>>({});
