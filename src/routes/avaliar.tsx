@@ -8,6 +8,7 @@ export const Route = createFileRoute("/avaliar")({
   ssr: false,
   validateSearch: (s: Record<string, unknown>) => ({
     quarto: s.quarto != null ? Number(s.quarto) : undefined,
+    empresa: s.empresa != null ? String(s.empresa) : undefined,
   }),
   component: Avaliar,
 });
@@ -22,7 +23,7 @@ const CRITERIA = [
 ] as const;
 
 function Avaliar() {
-  const { quarto } = useSearch({ from: "/avaliar" });
+  const { quarto, empresa } = useSearch({ from: "/avaliar" });
   const [nome, setNome] = useState("");
   const [quartoInput, setQuartoInput] = useState<string>(quarto ? String(quarto) : "");
   const [notas, setNotas] = useState<Record<string, number>>({});
@@ -37,10 +38,12 @@ function Avaliar() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!notas.nota_geral) return toast.error("Dê ao menos a nota geral");
+    if (!empresa) return toast.error("Link inválido: empresa não informada. Peça o QR Code correto na recepção.");
     setBusy(true);
     const q = quartoInput ? Number(quartoInput) : null;
     try {
       const { error } = await supabase.from("feedbacks").insert({
+        company_id: empresa,
         hospede_nome: nome.trim() || null,
         quarto: q,
         nota_geral: notas.nota_geral ?? null,
@@ -59,6 +62,7 @@ function Avaliar() {
 
       if (wifiProblema) {
         await supabase.from("complaints").insert({
+          company_id: empresa,
           quarto: q,
           categoria: "wifi",
           gravidade: "media",

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useCurrentCompanyId } from "@/hooks/use-company";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
 export type Room = Tables<"rooms">;
@@ -95,9 +96,12 @@ type TableName = "clients" | "reservations" | "sales" | "complaints" | "rooms" |
 
 export function useInsert<T extends TableName>(table: T, invalidate: string[]) {
   const qc = useQueryClient();
+  const companyId = useCurrentCompanyId();
   return useMutation({
-    mutationFn: async (row: TablesInsert<T>) => {
-      const { data, error } = await supabase.from(table).insert(row as never).select();
+    mutationFn: async (row: Omit<TablesInsert<T>, "company_id">) => {
+      if (!companyId) throw new Error("Empresa não selecionada");
+      const payload = { ...row, company_id: companyId } as unknown as TablesInsert<T>;
+      const { data, error } = await supabase.from(table).insert(payload as never).select();
       if (error) throw error;
       return data;
     },

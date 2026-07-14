@@ -184,7 +184,7 @@ function Reservas() {
                     toast.success("Reserva atualizada");
                     setEditing(null);
                   },
-                  onError: (e) => toast.error(e.message),
+                  onError: (e: Error) => toast.error(e.message),
                 },
               );
             } else {
@@ -193,7 +193,7 @@ function Reservas() {
                   toast.success("Reserva criada");
                   setOpen(false);
                 },
-                onError: (e) => toast.error(e.message),
+                onError: (e: Error) => toast.error(e.message),
               });
             }
           }}
@@ -225,7 +225,7 @@ function Reservas() {
                   toast.success(`Hóspede movido para o quarto ${newRoom}`);
                   setMoving(null);
                 },
-                onError: (e) => toast.error(e.message),
+                onError: (e: Error) => toast.error(e.message),
               },
             );
           }}
@@ -266,7 +266,7 @@ function RowActions({
                 },
                 {
                   onSuccess: () => toast.success("Sinal registrado"),
-                  onError: (e) => toast.error(e.message),
+                  onError: (e: Error) => toast.error(e.message),
                 },
               )
             }
@@ -288,7 +288,7 @@ function RowActions({
                 },
                 {
                   onSuccess: () => toast.success("Pagamento total registrado"),
-                  onError: (e) => toast.error(e.message),
+                  onError: (e: Error) => toast.error(e.message),
                 },
               )
             }
@@ -308,7 +308,7 @@ function RowActions({
               },
               {
                 onSuccess: () => toast.success("Check-in realizado"),
-                onError: (e) => toast.error(e.message),
+                onError: (e: Error) => toast.error(e.message),
               },
             )
           }
@@ -324,7 +324,7 @@ function RowActions({
               { id: reservation.id, patch: { status: "finalizado" } },
               {
                 onSuccess: () => toast.success("Check-out realizado"),
-                onError: (e) => toast.error(e.message),
+                onError: (e: Error) => toast.error(e.message),
               },
             )
           }
