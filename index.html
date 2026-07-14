@@ -130,14 +130,39 @@
   .hero-illustration{ width:100%; margin-top:8px; opacity:0.95;}
 
   /* ---------- About ---------- */
-  .about{ padding:88px 0 72px; background:var(--wall); }
-  .about-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:64px; align-items:start; }
-  .about h2{ font-size:clamp(1.9rem,3vw,2.5rem); font-weight:600; margin:12px 0 22px; }
-  .about p{ color:#3b352c; margin-bottom:16px; max-width:52ch; }
-  .facts{ display:flex; flex-direction:column; gap:0; border-top:1px solid var(--line); margin-top:8px;}
-  .fact{ display:flex; justify-content:space-between; padding:16px 0; border-bottom:1px solid var(--line); }
-  .fact b{ font-family:'Fraunces',serif; font-weight:600; font-size:1.05rem; }
-  .fact span{ font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--pine); text-transform:uppercase; letter-spacing:0.06em; }
+  .about{ background:var(--pine-deep); color:var(--paper); overflow:hidden; }
+  .about-photo-band{
+    min-height:650px;
+    display:flex;
+    align-items:center;
+    background:
+      linear-gradient(90deg, rgba(7,73,54,0.92) 0%, rgba(7,73,54,0.82) 38%, rgba(7,73,54,0.48) 68%, rgba(7,73,54,0.2) 100%),
+      url("assets/quarto-hotel-real.png") center right / cover no-repeat;
+  }
+  .about-overlay-grid{ display:grid; grid-template-columns:minmax(0, 1fr) minmax(280px, 0.56fr); gap:56px; align-items:end; padding-top:88px; padding-bottom:88px; }
+  .about h2{ font-size:clamp(2rem,4vw,3.55rem); font-weight:600; line-height:1.04; margin:12px 0 22px; max-width:11ch; }
+  .about p{ color:rgba(255,252,240,0.84); margin-bottom:16px; max-width:56ch; }
+  .about .eyebrow{ color:var(--gold-soft); }
+  .about-pill-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; max-width:620px; }
+  .about-pill{
+    border:1px solid rgba(243,223,139,0.5);
+    border-radius:999px;
+    background:rgba(255,252,240,0.1);
+    color:var(--paper);
+    font-size:0.86rem;
+    font-weight:600;
+    padding:8px 13px;
+  }
+  .about-glass{
+    border:1px solid rgba(255,252,240,0.24);
+    border-radius:14px;
+    background:rgba(7,73,54,0.44);
+    backdrop-filter:blur(8px);
+    box-shadow:0 20px 50px -28px rgba(0,0,0,0.45);
+    padding:26px;
+  }
+  .about-glass b{ display:block; font-family:'Fraunces',serif; font-size:2.3rem; line-height:1; color:var(--gold-soft); margin-bottom:10px; }
+  .about-glass span{ display:block; color:rgba(255,252,240,0.82); font-size:0.95rem; }
 
   /* ---------- Amenities ---------- */
   .amenities{ padding:80px 0; background:var(--paper); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
@@ -224,7 +249,15 @@
     .menu-toggle{ display:flex; }
     .hero .wrap{ grid-template-columns:1fr; padding-bottom:48px; }
     .hero{ padding-top:110px; }
-    .about-grid, .loc-grid, .contact-grid{ grid-template-columns:1fr; gap:36px; }
+    .about-overlay-grid, .loc-grid, .contact-grid{ grid-template-columns:1fr; gap:36px; }
+    .about-photo-band{
+      min-height:auto;
+      background:
+        linear-gradient(180deg, rgba(7,73,54,0.92) 0%, rgba(7,73,54,0.74) 54%, rgba(7,73,54,0.4) 100%),
+        url("assets/quarto-hotel-real.png") center / cover no-repeat;
+    }
+    .about-overlay-grid{ padding-top:72px; padding-bottom:72px; }
+    .about h2{ max-width:13ch; }
     .reservation-grid{ grid-template-columns:1fr; gap:32px; }
     .grid-amn{ grid-template-columns:1fr 1fr; }
     .footer-grid{ flex-direction:column; align-items:flex-start; }
@@ -294,21 +327,24 @@
 </section>
 
 <section class="about" id="sobre">
-  <div class="wrap about-grid">
-    <div class="reveal">
-      <p class="eyebrow">O hotel</p>
-      <h2>Tradição hospitaleira na Serra da Mantiqueira</h2>
-      <p>Localizado na Rua Capitão Pinto, bem no centro de Cruzília, o Hotel Real está a uma quadra da praça principal, cercado por padarias, farmácias, mercado e pontos de ônibus &mdash; tudo a pé.</p>
-      <p>São 39 quartos simples e bem cuidados, com opções com ar condicionado e sem ar. Temos quartos de casal, solteiro e duplo solteiro, com roupa de cama e toalhas incluídas.</p>
-      <p>Café da manhã caseiro, à mineira, servido todas as manhãs para começar o dia com energia.</p>
-    </div>
-    <div class="reveal">
-      <div class="facts">
-        <div class="fact"><b>Endereço</b><span>Rua Capitão Pinto, 70</span></div>
-        <div class="fact"><b>Bairro</b><span>Centro &middot; Cruzília, MG</span></div>
-        <div class="fact"><b>CEP</b><span>37445-000</span></div>
-        <div class="fact"><b>Check-in / Check-out</b><span>A combinar na reserva</span></div>
-        <div class="fact"><b>Pagamento</b><span>Consultar formas aceitas</span></div>
+  <div class="about-photo-band">
+    <div class="wrap about-overlay-grid">
+      <div class="about-copy reveal">
+        <p class="eyebrow">O hotel</p>
+        <h2>Hospedagem simples, bem cuidada e central</h2>
+        <p>Localizado na Rua Capitão Pinto, bem no centro de Cruzília, o Hotel Real está a uma quadra da praça principal, cercado por padarias, farmácias, mercado e pontos de ônibus &mdash; tudo a pé.</p>
+        <p>São 39 quartos simples e bem cuidados, com opções com ar condicionado e sem ar. Temos quartos de casal, solteiro e duplo solteiro, com roupa de cama e toalhas incluídas.</p>
+        <div class="about-pill-row" aria-label="Destaques do hotel">
+          <span class="about-pill">Wi-Fi gratuito</span>
+          <span class="about-pill">Café da manhã</span>
+          <span class="about-pill">Estacionamento</span>
+          <span class="about-pill">Localização central</span>
+          <span class="about-pill">Quartos com e sem ar</span>
+        </div>
+      </div>
+      <div class="about-glass reveal">
+        <b>39 quartos</b>
+        <span>Opções para quem viaja a trabalho, em família ou está de passagem por Cruzília.</span>
       </div>
     </div>
   </div>
