@@ -138,7 +138,7 @@ function Integracoes() {
                 <th className="p-3">Origem</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Reserva</th>
-                <th className="p-3">Erro</th>
+                <th className="p-3">Detalhes</th>
               </tr>
             </thead>
             <tbody>
@@ -152,7 +152,7 @@ function Integracoes() {
                     </Badge>
                   </td>
                   <td className="p-3 font-mono text-xs">{event.reservation_id ?? "-"}</td>
-                  <td className="max-w-[360px] truncate p-3 text-muted-foreground">{event.error ?? "-"}</td>
+                  <td className="max-w-[420px] truncate p-3 text-muted-foreground">{event.error ?? eventSummary(event)}</td>
                 </tr>
               ))}
             </tbody>
@@ -198,6 +198,31 @@ function Integracoes() {
 
 function labelType(type: string) {
   return TYPES.find((item) => item.value === type)?.label ?? type;
+}
+
+function eventSummary(event: { payload?: unknown; source: string }) {
+  const payload = event.payload as Record<string, unknown> | undefined;
+  if (!payload || typeof payload !== "object") return "-";
+
+  const nome = text(payload.nome ?? payload.name ?? payload.guest_name);
+  const telefone = text(payload.telefone ?? payload.phone ?? payload.whatsapp);
+  const checkin = text(payload.checkin ?? payload.check_in ?? payload.arrival);
+  const checkout = text(payload.checkout ?? payload.check_out ?? payload.departure);
+  const pessoas = text(payload.pessoas ?? payload.guests ?? payload.hospedes ?? payload.adults);
+
+  const parts = [
+    nome && `Nome: ${nome}`,
+    telefone && `WhatsApp: ${telefone}`,
+    checkin && checkout && `Periodo: ${checkin} a ${checkout}`,
+    pessoas && `Pessoas: ${pessoas}`,
+  ].filter(Boolean);
+
+  return parts.length ? parts.join(" | ") : event.source;
+}
+
+function text(value: unknown) {
+  const result = String(value ?? "").trim();
+  return result || null;
 }
 
 function IntegrationForm({
