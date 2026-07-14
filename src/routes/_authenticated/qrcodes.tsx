@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { Printer } from "lucide-react";
 import { useRooms } from "@/lib/data";
+import { useCurrentCompanyId } from "@/hooks/use-company";
 import { fmtBRL } from "@/lib/format";
 import { PageHeader } from "@/components/AppLayout";
 
@@ -12,16 +13,17 @@ export const Route = createFileRoute("/_authenticated/qrcodes")({
 
 function QrCodes() {
   const { data: rooms = [] } = useRooms();
+  const companyId = useCurrentCompanyId();
   const [codes, setCodes] = useState<Record<number, string>>({});
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   const urls = useMemo(
     () =>
       rooms.reduce<Record<number, string>>((acc, r) => {
-        acc[r.numero] = `${origin}/avaliar?quarto=${r.numero}`;
+        acc[r.numero] = `${origin}/avaliar?quarto=${r.numero}&empresa=${companyId ?? ""}`;
         return acc;
       }, {}),
-    [rooms, origin],
+    [rooms, origin, companyId],
   );
 
   useEffect(() => {
