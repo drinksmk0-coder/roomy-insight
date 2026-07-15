@@ -543,7 +543,11 @@
       if (!response.ok) throw new Error(await response.text());
 
       reservationForm.reset();
-      reservationStatus.textContent = 'Pré-reserva enviada. A recepção vai confirmar pelo WhatsApp.';
+      const text = encodeURIComponent(
+        `Olá, fiz uma pré-reserva pelo site do Hotel Real.\nNome: ${payload.nome}\nTelefone: ${payload.telefone}\nEntrada: ${payload.checkin}\nSaída: ${payload.checkout}\nPessoas: ${payload.pessoas}\nObservações: ${payload.observacoes}`
+      );
+      reservationStatus.innerHTML = `Pré-reserva enviada ao sistema. <a href="${WHATSAPP_URL}?text=${text}" target="_blank" rel="noopener">Enviar também pelo WhatsApp</a>.`;
+      window.open(`${WHATSAPP_URL}?text=${text}`, '_blank', 'noopener');
     } catch (error) {
       const text = encodeURIComponent(
         `Olá, gostaria de fazer uma pré-reserva.\nNome: ${payload.nome}\nTelefone: ${payload.telefone}\nEntrada: ${payload.checkin}\nSaída: ${payload.checkout}\nPessoas: ${payload.pessoas}\nObservações: ${payload.observacoes}`
