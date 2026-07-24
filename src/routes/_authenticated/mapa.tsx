@@ -16,7 +16,7 @@ import {
   roomBlock,
   type Room,
 } from "@/lib/data";
-import { fmtBRL, fmtDate, fmtTime, todayISO } from "@/lib/format";
+import { fmtBRL, fmtDate, todayISO } from "@/lib/format";
 import { complaintLabel } from "@/lib/constants";
 import { PageHeader } from "@/components/AppLayout";
 import { Modal, Badge } from "@/components/ui-kit";
