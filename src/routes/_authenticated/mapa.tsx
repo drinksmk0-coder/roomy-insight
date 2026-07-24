@@ -414,8 +414,8 @@ function RoomModal({
             <div className="space-y-1 text-sm">
               <p className="font-semibold">{reservation.cliente_nome}</p>
               <p className="text-muted-foreground">
-                {fmtDate(reservation.checkin)} {fmtTime(reservation.horario_checkin)} →{" "}
-                {fmtDate(reservation.checkout)} {fmtTime(reservation.horario_checkout)} · {reservation.diarias} diária(s)
+                {fmtDate(reservation.checkin)} →{" "}
+                {fmtDate(reservation.checkout)} · {reservation.diarias} diária(s)
               </p>
               <p>Diárias: {fmtBRL(reservation.valor_total)}</p>
               <p>
