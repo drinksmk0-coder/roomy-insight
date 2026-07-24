@@ -435,8 +435,8 @@ function RoomModal({
               {futureReservations.map((fr) => (
                 <li key={fr.id} className="flex items-center justify-between border-b border-border/60 py-1">
                   <span>
-                    {fr.cliente_nome} · {fmtDate(fr.checkin)} {fmtTime(fr.horario_checkin)} →{" "}
-                    {fmtDate(fr.checkout)} {fmtTime(fr.horario_checkout)}
+                    {fr.cliente_nome} · {fmtDate(fr.checkin)} →{" "}
+                    {fmtDate(fr.checkout)}
                   </span>
                   <Badge tone="brass">{fr.status}</Badge>
                 </li>
