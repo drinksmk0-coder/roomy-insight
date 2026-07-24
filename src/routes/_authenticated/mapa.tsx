@@ -240,7 +240,7 @@ function Mapa() {
                           >
                             <span className="block uppercase tracking-wider opacity-70">Próxima</span>
                             <span className={`font-medium ${isFree ? "text-white" : "text-pine-dark"}`}>
-                              {fmtDate(next.checkin)} · {fmtTime(next.horario_checkin)}
+                              {fmtDate(next.checkin)}
                             </span>
                           </p>
                         ) : (
