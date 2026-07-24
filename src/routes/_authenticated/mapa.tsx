@@ -364,7 +364,7 @@ function RoomModal({
   onClose: () => void;
   reservation: ReturnType<typeof activeReservationForRoom>;
   futureReservations: ReturnType<typeof futureReservationsForRoom>;
-  sales: { id: string; item: string; qtd: number; total: number; reserva_id: string | null; categoria: string | null }[];
+  sales: { id: string; item: string; qtd: number; total: number; reserva_id: string | null }[];
   complaints: { id: string; categoria: string; descricao: string | null; status: string; created_at: string }[];
   onNew: () => void;
   onSituacao: (situacao: string | null) => void;
