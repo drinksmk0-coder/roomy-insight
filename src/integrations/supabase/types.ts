@@ -17,6 +17,7 @@ export type Database = {
       clients: {
         Row: {
           cidade: string | null
+          company_id: string
           cpf: string | null
           created_at: string
           created_by: string | null
@@ -32,6 +33,7 @@ export type Database = {
         }
         Insert: {
           cidade?: string | null
+          company_id: string
           cpf?: string | null
           created_at?: string
           created_by?: string | null
@@ -47,6 +49,7 @@ export type Database = {
         }
         Update: {
           cidade?: string | null
+          company_id?: string
           cpf?: string | null
           created_at?: string
           created_by?: string | null
@@ -60,11 +63,182 @@ export type Database = {
           tipo?: string
           visitas?: number
         }
+        Relationships: [
+          {
+            foreignKeyName: "clients_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          endereco: string | null
+          estado: string | null
+          id: string
+          nome: string
+          slug: string | null
+          telefone: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          endereco?: string | null
+          estado?: string | null
+          id?: string
+          nome: string
+          slug?: string | null
+          telefone?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          endereco?: string | null
+          estado?: string | null
+          id?: string
+          nome?: string
+          slug?: string | null
+          telefone?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
         Relationships: []
+      }
+      company_integrations: {
+        Row: {
+          company_id: string
+          config: Json
+          created_at: string
+          id: string
+          name: string | null
+          provider: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          config?: Json
+          created_at?: string
+          id?: string
+          name?: string | null
+          provider: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          config?: Json
+          created_at?: string
+          id?: string
+          name?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_integrations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_invites: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          email: string
+          id: string
+          role: string
+          status: string
+          token: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          email: string
+          id?: string
+          role: string
+          status?: string
+          token?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          id?: string
+          role?: string
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_invites_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_members: {
+        Row: {
+          ativo: boolean
+          company_id: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          company_id: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          company_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_members_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       complaints: {
         Row: {
           categoria: string
+          company_id: string
           created_at: string
           created_by: string | null
           descricao: string | null
@@ -80,6 +254,7 @@ export type Database = {
         }
         Insert: {
           categoria?: string
+          company_id: string
           created_at?: string
           created_by?: string | null
           descricao?: string | null
@@ -95,6 +270,7 @@ export type Database = {
         }
         Update: {
           categoria?: string
+          company_id?: string
           created_at?: string
           created_by?: string | null
           descricao?: string | null
@@ -110,17 +286,75 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "complaints_quarto_fkey"
-            columns: ["quarto"]
+            foreignKeyName: "complaints_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "complaints_room_fkey"
+            columns: ["company_id", "quarto"]
             isOneToOne: false
             referencedRelation: "rooms"
-            referencedColumns: ["numero"]
+            referencedColumns: ["company_id", "numero"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          categoria: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          data: string
+          descricao: string | null
+          id: string
+          metodo_pagamento: string | null
+          observacao: string | null
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          categoria: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          descricao?: string | null
+          id?: string
+          metodo_pagamento?: string | null
+          observacao?: string | null
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          categoria?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          descricao?: string | null
+          id?: string
+          metodo_pagamento?: string | null
+          observacao?: string | null
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
           },
         ]
       }
       feedbacks: {
         Row: {
           comentario: string | null
+          company_id: string
           created_at: string
           hospede_nome: string | null
           id: string
@@ -138,6 +372,7 @@ export type Database = {
         }
         Insert: {
           comentario?: string | null
+          company_id: string
           created_at?: string
           hospede_nome?: string | null
           id?: string
@@ -155,6 +390,7 @@ export type Database = {
         }
         Update: {
           comentario?: string | null
+          company_id?: string
           created_at?: string
           hospede_nome?: string | null
           id?: string
@@ -170,45 +406,12 @@ export type Database = {
           wifi_dispositivo?: string | null
           wifi_problema?: boolean
         }
-        Relationships: []
-      }
-      integration_events: {
-        Row: {
-          created_at: string
-          error: string | null
-          external_id: string | null
-          id: string
-          payload: Json
-          reservation_id: string | null
-          source: string
-          status: string
-        }
-        Insert: {
-          created_at?: string
-          error?: string | null
-          external_id?: string | null
-          id?: string
-          payload?: Json
-          reservation_id?: string | null
-          source: string
-          status?: string
-        }
-        Update: {
-          created_at?: string
-          error?: string | null
-          external_id?: string | null
-          id?: string
-          payload?: Json
-          reservation_id?: string | null
-          source?: string
-          status?: string
-        }
         Relationships: [
           {
-            foreignKeyName: "integration_events_reservation_id_fkey"
-            columns: ["reservation_id"]
+            foreignKeyName: "feedbacks_company_id_fkey"
+            columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "reservations"
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -234,42 +437,6 @@ export type Database = {
         }
         Relationships: []
       }
-      products: {
-        Row: {
-          ativo: boolean
-          categoria: string
-          created_at: string
-          created_by: string | null
-          estoque_atual: number
-          estoque_minimo: number
-          id: string
-          nome: string
-          preco: number
-        }
-        Insert: {
-          ativo?: boolean
-          categoria?: string
-          created_at?: string
-          created_by?: string | null
-          estoque_atual?: number
-          estoque_minimo?: number
-          id?: string
-          nome: string
-          preco?: number
-        }
-        Update: {
-          ativo?: boolean
-          categoria?: string
-          created_at?: string
-          created_by?: string | null
-          estoque_atual?: number
-          estoque_minimo?: number
-          id?: string
-          nome?: string
-          preco?: number
-        }
-        Relationships: []
-      }
       reservations: {
         Row: {
           canal: string | null
@@ -278,13 +445,11 @@ export type Database = {
           checkout: string
           cliente_id: string | null
           cliente_nome: string
+          company_id: string
           created_at: string
           created_by: string | null
           desconto: number
           diarias: number
-          horario_checkin: string | null
-          horario_checkout: string | null
-          horario_reserva: string | null
           id: string
           pagamento: string
           pago: boolean
@@ -303,13 +468,11 @@ export type Database = {
           checkout: string
           cliente_id?: string | null
           cliente_nome: string
+          company_id: string
           created_at?: string
           created_by?: string | null
           desconto?: number
           diarias?: number
-          horario_checkin?: string | null
-          horario_checkout?: string | null
-          horario_reserva?: string | null
           id?: string
           pagamento?: string
           pago?: boolean
@@ -328,13 +491,11 @@ export type Database = {
           checkout?: string
           cliente_id?: string | null
           cliente_nome?: string
+          company_id?: string
           created_at?: string
           created_by?: string | null
           desconto?: number
           diarias?: number
-          horario_checkin?: string | null
-          horario_checkout?: string | null
-          horario_reserva?: string | null
           id?: string
           pagamento?: string
           pago?: boolean
@@ -355,11 +516,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "reservations_quarto_fkey"
-            columns: ["quarto"]
+            foreignKeyName: "reservations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_room_fkey"
+            columns: ["company_id", "quarto"]
             isOneToOne: false
             referencedRelation: "rooms"
-            referencedColumns: ["numero"]
+            referencedColumns: ["company_id", "numero"]
           },
         ]
       }
@@ -367,6 +535,7 @@ export type Database = {
         Row: {
           andar: number
           banheiro: boolean
+          company_id: string
           configuracao: string
           numero: number
           preco: number
@@ -375,6 +544,7 @@ export type Database = {
         Insert: {
           andar: number
           banheiro?: boolean
+          company_id: string
           configuracao: string
           numero: number
           preco?: number
@@ -383,23 +553,31 @@ export type Database = {
         Update: {
           andar?: number
           banheiro?: boolean
+          company_id?: string
           configuracao?: string
           numero?: number
           preco?: number
           situacao?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "rooms_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sales: {
         Row: {
-          categoria: string | null
+          company_id: string
           created_at: string
           created_by: string | null
           data: string
           id: string
           item: string
           pagamento: string
-          produto_id: string | null
           qtd: number
           quarto: number
           reserva_id: string | null
@@ -407,14 +585,13 @@ export type Database = {
           valor_unit: number
         }
         Insert: {
-          categoria?: string | null
+          company_id: string
           created_at?: string
           created_by?: string | null
           data?: string
           id?: string
           item: string
           pagamento?: string
-          produto_id?: string | null
           qtd?: number
           quarto: number
           reserva_id?: string | null
@@ -422,14 +599,13 @@ export type Database = {
           valor_unit?: number
         }
         Update: {
-          categoria?: string | null
+          company_id?: string
           created_at?: string
           created_by?: string | null
           data?: string
           id?: string
           item?: string
           pagamento?: string
-          produto_id?: string | null
           qtd?: number
           quarto?: number
           reserva_id?: string | null
@@ -438,18 +614,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "sales_produto_id_fkey"
-            columns: ["produto_id"]
+            foreignKeyName: "sales_company_id_fkey"
+            columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: "companies"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sales_quarto_fkey"
-            columns: ["quarto"]
-            isOneToOne: false
-            referencedRelation: "rooms"
-            referencedColumns: ["numero"]
           },
           {
             foreignKeyName: "sales_reserva_id_fkey"
@@ -457,6 +626,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "reservations"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_room_fkey"
+            columns: ["company_id", "quarto"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["company_id", "numero"]
           },
         ]
       }
@@ -481,47 +657,15 @@ export type Database = {
         }
         Relationships: []
       }
-      whatsapp_reservation_sessions: {
-        Row: {
-          chat_id: string | null
-          created_at: string
-          draft: Json
-          id: string
-          last_message: string | null
-          last_response: string | null
-          phone: string
-          stage: string
-          updated_at: string
-        }
-        Insert: {
-          chat_id?: string | null
-          created_at?: string
-          draft?: Json
-          id?: string
-          last_message?: string | null
-          last_response?: string | null
-          phone: string
-          stage?: string
-          updated_at?: string
-        }
-        Update: {
-          chat_id?: string | null
-          created_at?: string
-          draft?: Json
-          id?: string
-          last_message?: string | null
-          last_response?: string | null
-          phone?: string
-          stage?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      has_company_role: {
+        Args: { _company_id: string; _roles: string[]; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -529,19 +673,24 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_company_member: {
+        Args: { _company_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       reservation_has_overlap: {
         Args: {
           _checkin: string
           _checkout: string
-          _exclude_id?: string
+          _company_id: string
+          _exclude?: string
           _quarto: number
         }
         Returns: boolean
       }
     }
     Enums: {
-      app_role: "dono" | "recepcao" | "limpeza" | "cafe"
+      app_role: "dono" | "recepcao"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -669,7 +818,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["dono", "recepcao", "limpeza", "cafe"],
+      app_role: ["dono", "recepcao"],
     },
   },
 } as const
