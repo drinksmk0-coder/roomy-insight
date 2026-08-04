@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { CalendarClock, MessageCircle, Plus, Webhook } from "lucide-react";
+import { CalendarClock, ExternalLink, MessageCircle, Plus, Webhook } from "lucide-react";
 import { PageHeader } from "@/components/AppLayout";
 import { Badge, EmptyState, Field, Modal } from "@/components/ui-kit";
 import {
@@ -72,10 +72,14 @@ function Integracoes() {
         <section className="card-surface p-4">
           <div className="mb-3 flex items-center gap-2">
             <CalendarClock className="h-4 w-4 text-pine" />
-            <h3 className="font-serif text-lg font-bold">Canais cadastrados</h3>
+            <h3 className="font-serif text-lg font-bold">Booking</h3>
           </div>
-          <p className="font-serif text-3xl font-bold">{integrations.length}</p>
-          <p className="text-sm text-muted-foreground">Booking, Airbnb, Google, WhatsApp e outros provedores.</p>
+          <p className="text-sm text-muted-foreground">
+            Consulte os eventos recebidos, as reservas relacionadas e o resultado dos cancelamentos.
+          </p>
+          <Link to="/booking-eventos" className="btn-primary mt-4 inline-flex items-center gap-1.5">
+            Abrir <ExternalLink className="h-4 w-4" />
+          </Link>
         </section>
 
         <section className="card-surface p-4">
