@@ -5,8 +5,8 @@
   "installCommand": "npm install",
   "rewrites": [
     {
-      "source": "/((?!booking-eventos(?:/|$)|_build/|assets/|favicon.ico|robots.txt|sitemap.xml).*)",
-      "destination": "/"
+      "source": "/",
+      "destination": "/index.html"
     }
   ]
 }
