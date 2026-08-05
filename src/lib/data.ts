@@ -249,6 +249,61 @@ export function useInsert<T extends TableName>(table: T, invalidate: string[]) {
   });
 }
 
+// --- Comanda (venda com vários itens) ---
+export type SaleOrderItem = {
+  produto_id: string | null;
+  item: string;
+  categoria: string;
+  qtd: number;
+  valor_unit: number;
+};
+
+export type SaleOrderInput = {
+  tipo: "hospede" | "funcionario";
+  quarto: number | null;
+  reserva_id: string | null;
+  cliente_id: string | null;
+  consumidor: string | null;
+  pagamento: string;
+  data: string;
+  itens: SaleOrderItem[];
+};
+
+/**
+ * Grava a comanda inteira via RPC transacional: ou todos os itens entram e o
+ * estoque baixa, ou nada é gravado. A mensagem real do Postgres é propagada.
+ */
+export function useSaleOrder() {
+  const qc = useQueryClient();
+  const company = useCurrentCompany();
+  return useMutation({
+    mutationFn: async (input: SaleOrderInput) => {
+      if (!company.data?.id) throw new Error("Nenhuma empresa selecionada.");
+      if (!input.itens.length) throw new Error("Adicione ao menos um item à comanda.");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).rpc("create_sale_order", {
+        _company_id: company.data.id,
+        _tipo: input.tipo,
+        _quarto: input.quarto,
+        _reserva_id: input.reserva_id,
+        _cliente_id: input.cliente_id,
+        _consumidor: input.consumidor,
+        _pagamento: input.pagamento,
+        _data: input.data,
+        _itens: input.itens,
+      });
+      if (error) {
+        const detail = [error.message, error.details, error.hint].filter(Boolean).join(" — ");
+        throw new Error(detail || "Falha desconhecida ao salvar a comanda.");
+      }
+      return data as string;
+    },
+    onSuccess: () => {
+      ["sales", "products"].forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
+    },
+  });
+}
+
 export function useUpdate<T extends TableName>(table: T, invalidate: string[]) {
   const qc = useQueryClient();
   const company = useCurrentCompany();
