@@ -416,6 +416,56 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          ativo: boolean
+          categoria: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          estoque_atual: number
+          estoque_minimo: number
+          id: string
+          nome: string
+          preco: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          estoque_atual?: number
+          estoque_minimo?: number
+          id?: string
+          nome: string
+          preco?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          estoque_atual?: number
+          estoque_minimo?: number
+          id?: string
+          nome?: string
+          preco?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -571,53 +621,85 @@ export type Database = {
       }
       sales: {
         Row: {
+          categoria: string
+          cliente_id: string | null
+          comanda_id: string | null
           company_id: string
+          consumidor: string | null
           created_at: string
           created_by: string | null
           data: string
           id: string
           item: string
           pagamento: string
+          produto_id: string | null
           qtd: number
-          quarto: number
+          quarto: number | null
           reserva_id: string | null
+          tipo: string
           total: number
           valor_unit: number
         }
         Insert: {
+          categoria?: string
+          cliente_id?: string | null
+          comanda_id?: string | null
           company_id: string
+          consumidor?: string | null
           created_at?: string
           created_by?: string | null
           data?: string
           id?: string
           item: string
           pagamento?: string
+          produto_id?: string | null
           qtd?: number
-          quarto: number
+          quarto?: number | null
           reserva_id?: string | null
+          tipo?: string
           total?: number
           valor_unit?: number
         }
         Update: {
+          categoria?: string
+          cliente_id?: string | null
+          comanda_id?: string | null
           company_id?: string
+          consumidor?: string | null
           created_at?: string
           created_by?: string | null
           data?: string
           id?: string
           item?: string
           pagamento?: string
+          produto_id?: string | null
           qtd?: number
-          quarto?: number
+          quarto?: number | null
           reserva_id?: string | null
+          tipo?: string
           total?: number
           valor_unit?: number
         }
         Relationships: [
           {
+            foreignKeyName: "sales_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "sales_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
@@ -662,6 +744,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_sale_order: {
+        Args: {
+          _cliente_id: string
+          _company_id: string
+          _consumidor: string
+          _data: string
+          _itens: Json
+          _pagamento: string
+          _quarto: number
+          _reserva_id: string
+          _tipo: string
+        }
+        Returns: string
+      }
       has_company_role: {
         Args: { _company_id: string; _roles: string[]; _user_id: string }
         Returns: boolean
