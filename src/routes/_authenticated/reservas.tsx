@@ -44,13 +44,17 @@ function Reservas() {
   const [editing, setEditing] = useState<Reservation | null>(null);
   const [moving, setMoving] = useState<Reservation | null>(null);
   const [filter, setFilter] = useState("ativas");
+  const [dateFilter, setDateFilter] = useState("");
 
   const filtered = useMemo(() => {
-    if (filter === "ativas")
-      return reservations.filter((r) => !["finalizado", "cancelado"].includes(r.status));
-    if (filter === "todas") return reservations;
-    return reservations.filter((r) => r.status === filter);
-  }, [reservations, filter]);
+    let list = reservations;
+    if (filter === "ativas") list = list.filter((r) => !["finalizado", "cancelado"].includes(r.status));
+    else if (filter !== "todas") list = list.filter((r) => r.status === filter);
+    // Estadia que cobre a data escolhida: checkin <= data <= checkout.
+    if (dateFilter) list = list.filter((r) => r.checkin <= dateFilter && r.checkout >= dateFilter);
+    return list;
+  }, [reservations, filter, dateFilter]);
+
 
   function exportCSV() {
     const rows: (string | number | null)[][] = [
@@ -111,7 +115,7 @@ function Reservas() {
         }
       />
 
-      <div className="mb-4 flex flex-wrap gap-1.5 text-sm">
+      <div className="mb-4 flex flex-wrap items-center gap-1.5 text-sm">
         {["ativas", "reservado", "ocupado", "finalizado", "todas"].map((f) => (
           <button
             key={f}
@@ -121,7 +125,31 @@ function Reservas() {
             {f}
           </button>
         ))}
+        <span className="ml-2 flex items-center gap-1.5">
+          <label htmlFor="filtro-data" className="text-xs uppercase text-muted-foreground">
+            Na data
+          </label>
+          <input
+            id="filtro-data"
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="rounded-full border border-border bg-muted px-3 py-1 font-semibold text-muted-foreground"
+          />
+          {(dateFilter || filter !== "ativas") && (
+            <button
+              onClick={() => {
+                setDateFilter("");
+                setFilter("ativas");
+              }}
+              className="rounded-full bg-muted px-3 py-1 font-semibold text-muted-foreground"
+            >
+              Limpar
+            </button>
+          )}
+        </span>
       </div>
+
 
       {filtered.length === 0 ? (
         <EmptyState text="Nenhuma reserva neste filtro." />

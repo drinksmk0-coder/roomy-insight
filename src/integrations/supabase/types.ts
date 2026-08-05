@@ -416,6 +416,107 @@ export type Database = {
           },
         ]
       }
+      integration_events: {
+        Row: {
+          company_id: string
+          created_at: string
+          error: string | null
+          external_id: string | null
+          id: string
+          payload: Json
+          reservation_id: string | null
+          source: string
+          status: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          error?: string | null
+          external_id?: string | null
+          id?: string
+          payload?: Json
+          reservation_id?: string | null
+          source: string
+          status?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          error?: string | null
+          external_id?: string | null
+          id?: string
+          payload?: Json
+          reservation_id?: string | null
+          source?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integration_events_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          ativo: boolean
+          categoria: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          estoque_atual: number
+          estoque_minimo: number
+          id: string
+          nome: string
+          preco: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          estoque_atual?: number
+          estoque_minimo?: number
+          id?: string
+          nome: string
+          preco?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          estoque_atual?: number
+          estoque_minimo?: number
+          id?: string
+          nome?: string
+          preco?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -450,6 +551,9 @@ export type Database = {
           created_by: string | null
           desconto: number
           diarias: number
+          horario_checkin: string | null
+          horario_checkout: string | null
+          horario_reserva: string | null
           id: string
           pagamento: string
           pago: boolean
@@ -473,6 +577,9 @@ export type Database = {
           created_by?: string | null
           desconto?: number
           diarias?: number
+          horario_checkin?: string | null
+          horario_checkout?: string | null
+          horario_reserva?: string | null
           id?: string
           pagamento?: string
           pago?: boolean
@@ -496,6 +603,9 @@ export type Database = {
           created_by?: string | null
           desconto?: number
           diarias?: number
+          horario_checkin?: string | null
+          horario_checkout?: string | null
+          horario_reserva?: string | null
           id?: string
           pagamento?: string
           pago?: boolean
@@ -571,53 +681,85 @@ export type Database = {
       }
       sales: {
         Row: {
+          categoria: string
+          cliente_id: string | null
+          comanda_id: string | null
           company_id: string
+          consumidor: string | null
           created_at: string
           created_by: string | null
           data: string
           id: string
           item: string
           pagamento: string
+          produto_id: string | null
           qtd: number
-          quarto: number
+          quarto: number | null
           reserva_id: string | null
+          tipo: string
           total: number
           valor_unit: number
         }
         Insert: {
+          categoria?: string
+          cliente_id?: string | null
+          comanda_id?: string | null
           company_id: string
+          consumidor?: string | null
           created_at?: string
           created_by?: string | null
           data?: string
           id?: string
           item: string
           pagamento?: string
+          produto_id?: string | null
           qtd?: number
-          quarto: number
+          quarto?: number | null
           reserva_id?: string | null
+          tipo?: string
           total?: number
           valor_unit?: number
         }
         Update: {
+          categoria?: string
+          cliente_id?: string | null
+          comanda_id?: string | null
           company_id?: string
+          consumidor?: string | null
           created_at?: string
           created_by?: string | null
           data?: string
           id?: string
           item?: string
           pagamento?: string
+          produto_id?: string | null
           qtd?: number
-          quarto?: number
+          quarto?: number | null
           reserva_id?: string | null
+          tipo?: string
           total?: number
           valor_unit?: number
         }
         Relationships: [
           {
+            foreignKeyName: "sales_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "sales_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
@@ -657,11 +799,72 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_reservation_sessions: {
+        Row: {
+          chat_id: string | null
+          company_id: string
+          created_at: string
+          draft: Json
+          id: string
+          last_message: string | null
+          last_response: string | null
+          phone: string
+          stage: string
+          updated_at: string
+        }
+        Insert: {
+          chat_id?: string | null
+          company_id: string
+          created_at?: string
+          draft?: Json
+          id?: string
+          last_message?: string | null
+          last_response?: string | null
+          phone: string
+          stage?: string
+          updated_at?: string
+        }
+        Update: {
+          chat_id?: string | null
+          company_id?: string
+          created_at?: string
+          draft?: Json
+          id?: string
+          last_message?: string | null
+          last_response?: string | null
+          phone?: string
+          stage?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_reservation_sessions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      create_sale_order: {
+        Args: {
+          _cliente_id: string
+          _company_id: string
+          _consumidor: string
+          _data: string
+          _itens: Json
+          _pagamento: string
+          _quarto: number
+          _reserva_id: string
+          _tipo: string
+        }
+        Returns: string
+      }
       has_company_role: {
         Args: { _company_id: string; _roles: string[]; _user_id: string }
         Returns: boolean
@@ -690,7 +893,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "dono" | "recepcao"
+      app_role: "dono" | "recepcao" | "limpeza" | "cafe"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -818,7 +1021,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["dono", "recepcao"],
+      app_role: ["dono", "recepcao", "limpeza", "cafe"],
     },
   },
 } as const
