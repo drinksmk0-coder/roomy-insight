@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Download, Pencil } from "lucide-react";
+import { Plus, Download, Pencil, Trash2 } from "lucide-react";
 import {
   useRooms,
   useReservations,
@@ -9,8 +9,10 @@ import {
   useProducts,
   useInsert,
   useUpdate,
+  useSaleOrder,
   activeReservationForRoom,
   type Product,
+  type SaleOrderItem,
 } from "@/lib/data";
 import { fmtBRL, fmtDate, todayISO, downloadCSV } from "@/lib/format";
 import { PAYMENT_METHODS } from "@/lib/constants";
@@ -26,7 +28,7 @@ function Vendas() {
   const { data: reservations = [] } = useReservations();
   const { data: sales = [] } = useSales();
   const { data: products = [] } = useProducts();
-  const insert = useInsert("sales", ["sales", "products"]);
+  const saleOrder = useSaleOrder();
   const insertProduct = useInsert("products", ["products"]);
   const updateProduct = useUpdate("products", ["products"]);
   const [open, setOpen] = useState(false);
@@ -50,8 +52,19 @@ function Vendas() {
 
   function exportCSV() {
     downloadCSV(`vendas-${today}.csv`, [
-      ["Data", "Quarto", "Categoria", "Item", "Qtd", "Unitário", "Total", "Pagamento"],
-      ...sales.map((s) => [s.data, s.quarto, s.categoria ?? "Geral", s.item, s.qtd, s.valor_unit, s.total, s.pagamento]),
+      ["Data", "Tipo", "Quarto", "Consumidor", "Categoria", "Item", "Qtd", "Unitário", "Total", "Pagamento"],
+      ...sales.map((s) => [
+        s.data,
+        s.tipo ?? "hospede",
+        s.quarto ?? "",
+        s.consumidor ?? "",
+        s.categoria ?? "Geral",
+        s.item,
+        s.qtd,
+        s.valor_unit,
+        s.total,
+        s.pagamento,
+      ]),
     ]);
   }
 
@@ -59,7 +72,7 @@ function Vendas() {
     <div>
       <PageHeader
         title="Vendas extras"
-        subtitle="Bebidas, lavanderia e outros consumos. Cada venda é vinculada à hospedagem ativa do quarto."
+        subtitle="Bebidas, lavanderia e outros consumos. Cada comanda é vinculada à hospedagem ativa do quarto ou a um funcionário."
         action={
           <div className="flex gap-2">
             <button onClick={exportCSV} className="btn-ghost flex items-center gap-1.5">
@@ -69,7 +82,7 @@ function Vendas() {
               <Plus className="h-4 w-4" /> Produto
             </button>
             <button onClick={() => setOpen(true)} className="btn-primary flex items-center gap-1.5">
-              <Plus className="h-4 w-4" /> Nova venda
+              <Plus className="h-4 w-4" /> Nova comanda
             </button>
           </div>
         }
@@ -179,9 +192,12 @@ function Vendas() {
               {sales.map((s) => (
                 <tr key={s.id} className="border-b border-border/50">
                   <td className="p-3 text-muted-foreground">{fmtDate(s.data)}</td>
-                  <td className="p-3 font-semibold">{s.quarto}</td>
+                  <td className="p-3 font-semibold">{s.quarto ?? "—"}</td>
                   <td className="p-3 text-muted-foreground">{s.categoria ?? "Geral"}</td>
-                  <td className="p-3">{s.item}</td>
+                  <td className="p-3">
+                    {s.item}
+                    {s.consumidor && <span className="block text-xs text-muted-foreground">{s.consumidor}</span>}
+                  </td>
                   <td className="p-3">{s.qtd}</td>
                   <td className="p-3">{fmtBRL(s.total)}</td>
                   <td className="p-3 text-muted-foreground">{s.pagamento}</td>
@@ -193,20 +209,31 @@ function Vendas() {
       )}
 
       {open && (
-        <SaleForm
+        <ComandaForm
           rooms={rooms}
           products={products.filter((p) => p.ativo)}
+          saving={saleOrder.isPending}
           onClose={() => setOpen(false)}
-          onSave={(quarto, row) => {
-            const active = activeReservationForRoom(reservations, quarto);
-            insert.mutate(
-              { ...row, quarto, reserva_id: active?.id ?? null },
+          onSave={({ tipo, quarto, consumidor, pagamento, itens }) => {
+            const active = tipo === "hospede" && quarto != null ? activeReservationForRoom(reservations, quarto) : null;
+            saleOrder.mutate(
+              {
+                tipo,
+                quarto: tipo === "hospede" ? quarto : null,
+                reserva_id: active?.id ?? null,
+                cliente_id: active?.cliente_id ?? null,
+                consumidor,
+                pagamento,
+                data: todayISO(),
+                itens,
+              },
               {
                 onSuccess: () => {
-                  toast.success("Venda registrada");
+                  toast.success("Comanda salva");
                   setOpen(false);
                 },
-                onError: (e) => toast.error(e.message),
+                // Mostra a mensagem real vinda do banco (estoque, permissão, etc.)
+                onError: (e) => toast.error(e instanceof Error ? e.message : String(e)),
               },
             );
           }}
@@ -249,133 +276,209 @@ function Vendas() {
   );
 }
 
-function SaleForm({
+function ComandaForm({
   rooms,
   products,
+  saving,
   onClose,
   onSave,
 }: {
   rooms: ReturnType<typeof useRooms>["data"];
   products: Product[];
+  saving: boolean;
   onClose: () => void;
-  onSave: (
-    quarto: number,
-    row: {
-      item: string;
-      categoria: string;
-      produto_id: string | null;
-      qtd: number;
-      valor_unit: number;
-      total: number;
-      pagamento: string;
-      data: string;
-    },
-  ) => void;
+  onSave: (payload: {
+    tipo: "hospede" | "funcionario";
+    quarto: number | null;
+    consumidor: string | null;
+    pagamento: string;
+    itens: SaleOrderItem[];
+  }) => void;
 }) {
+  const [tipo, setTipo] = useState<"hospede" | "funcionario">("hospede");
   const [quarto, setQuarto] = useState<number>(rooms?.[0]?.numero ?? 0);
+  const [consumidor, setConsumidor] = useState("");
+  const [pagamento, setPagamento] = useState<string>(PAYMENT_METHODS[0]);
+  const [itens, setItens] = useState<SaleOrderItem[]>([]);
+
   const [produtoId, setProdutoId] = useState("");
   const [item, setItem] = useState("");
   const [categoria, setCategoria] = useState("Geral");
   const [qtd, setQtd] = useState(1);
   const [valor, setValor] = useState(0);
-  const [pagamento, setPagamento] = useState<string>(PAYMENT_METHODS[0]);
   const selectedProduct = products.find((p) => p.id === produtoId);
-  const total = qtd * valor;
+  const totalComanda = itens.reduce((a, i) => a + i.qtd * i.valor_unit, 0);
+
+  function addItem() {
+    const nome = selectedProduct?.nome ?? item.trim();
+    if (!nome) return toast.error("Informe o item");
+    if (qtd <= 0) return toast.error("Quantidade inválida");
+    if (selectedProduct) {
+      const jaNaComanda = itens
+        .filter((i) => i.produto_id === selectedProduct.id)
+        .reduce((a, i) => a + i.qtd, 0);
+      if (jaNaComanda + qtd > selectedProduct.estoque_atual) return toast.error("Estoque insuficiente");
+    }
+    setItens((prev) => [
+      ...prev,
+      {
+        produto_id: selectedProduct?.id ?? null,
+        item: nome,
+        categoria: selectedProduct?.categoria ?? (categoria.trim() || "Geral"),
+        qtd,
+        valor_unit: valor,
+      },
+    ]);
+    setProdutoId("");
+    setItem("");
+    setCategoria("Geral");
+    setQtd(1);
+    setValor(0);
+  }
 
   return (
-    <Modal open onClose={onClose} title="Nova venda">
+    <Modal open onClose={onClose} title="Nova comanda">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const saleItem = selectedProduct?.nome ?? item.trim();
-          const saleCategory = selectedProduct?.categoria ?? (categoria.trim() || "Geral");
-          if (!saleItem) return toast.error("Informe o item");
-          if (selectedProduct && qtd > selectedProduct.estoque_atual) return toast.error("Estoque insuficiente");
-          onSave(quarto, {
-            item: saleItem,
-            categoria: saleCategory,
-            produto_id: selectedProduct?.id ?? null,
-            qtd,
-            valor_unit: valor,
-            total,
+          if (!itens.length) return toast.error("Adicione ao menos um item à comanda");
+          if (tipo === "funcionario" && !consumidor.trim()) return toast.error("Informe o nome do funcionário");
+          onSave({
+            tipo,
+            quarto: tipo === "hospede" ? quarto : null,
+            consumidor: consumidor.trim() || null,
             pagamento,
-            data: todayISO(),
+            itens,
           });
         }}
         className="space-y-3"
       >
-        <Field label="Quarto">
-          <select className="field" value={quarto} onChange={(e) => setQuarto(Number(e.target.value))}>
-            {rooms?.map((r) => (
-              <option key={r.numero} value={r.numero}>
-                {r.numero}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Produto cadastrado">
-          <select
-            className="field"
-            value={produtoId}
-            onChange={(e) => {
-              const id = e.target.value;
-              setProdutoId(id);
-              const p = products.find((prod) => prod.id === id);
-              if (p) {
-                setItem("");
-                setCategoria(p.categoria);
-                setValor(Number(p.preco));
-              }
-            }}
-          >
-            <option value="">— venda avulsa —</option>
-            {products.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nome} · {p.categoria} · estoque {p.estoque_atual}
-              </option>
-            ))}
-          </select>
-        </Field>
-        {!selectedProduct && (
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Item avulso">
-              <input
-                className="field"
-                value={item}
-                onChange={(e) => setItem(e.target.value)}
-                required={!selectedProduct}
-                maxLength={60}
-                placeholder="Ex.: Lavanderia"
-              />
-            </Field>
-            <Field label="Categoria">
-              <input
-                className="field"
-                value={categoria}
-                onChange={(e) => setCategoria(e.target.value)}
-                required
-                maxLength={40}
-                placeholder="Ex.: Bebidas"
-              />
-            </Field>
-          </div>
-        )}
-        {selectedProduct && selectedProduct.estoque_atual <= selectedProduct.estoque_minimo && (
-          <p className="rounded-lg bg-brick-bg px-3 py-2 text-sm text-brick">Atenção: estoque baixo para este produto.</p>
-        )}
-        {selectedProduct && (
-          <p className="text-xs text-muted-foreground">
-            Categoria {selectedProduct.categoria} · estoque disponível {selectedProduct.estoque_atual}
-          </p>
-        )}
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Quantidade">
-            <input type="number" min={1} className="field" value={qtd} onChange={(e) => setQtd(Number(e.target.value))} />
+          <Field label="Tipo de comanda">
+            <select className="field" value={tipo} onChange={(e) => setTipo(e.target.value as "hospede" | "funcionario")}>
+              <option value="hospede">Hóspede</option>
+              <option value="funcionario">Funcionário</option>
+            </select>
           </Field>
-          <Field label="Valor unitário">
-            <input type="number" min={0} step="0.01" className="field" value={valor} onChange={(e) => setValor(Number(e.target.value))} />
-          </Field>
+          {tipo === "hospede" ? (
+            <Field label="Quarto">
+              <select className="field" value={quarto} onChange={(e) => setQuarto(Number(e.target.value))}>
+                {rooms?.map((r) => (
+                  <option key={r.numero} value={r.numero}>
+                    {r.numero}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          ) : (
+            <Field label="Funcionário">
+              <input className="field" value={consumidor} onChange={(e) => setConsumidor(e.target.value)} maxLength={80} required />
+            </Field>
+          )}
         </div>
+
+        {tipo === "hospede" && (
+          <Field label="Nome do hóspede (opcional)">
+            <input className="field" value={consumidor} onChange={(e) => setConsumidor(e.target.value)} maxLength={80} />
+          </Field>
+        )}
+
+        <div className="rounded-lg border border-border p-3">
+          <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Itens da comanda</p>
+          <Field label="Produto cadastrado">
+            <select
+              className="field"
+              value={produtoId}
+              onChange={(e) => {
+                const id = e.target.value;
+                setProdutoId(id);
+                const p = products.find((prod) => prod.id === id);
+                if (p) {
+                  setItem("");
+                  setCategoria(p.categoria);
+                  setValor(Number(p.preco));
+                }
+              }}
+            >
+              <option value="">— item avulso —</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nome} · {p.categoria} · estoque {p.estoque_atual}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {!selectedProduct && (
+            <div className="mt-2 grid grid-cols-2 gap-3">
+              <Field label="Item avulso">
+                <input
+                  className="field"
+                  value={item}
+                  onChange={(e) => setItem(e.target.value)}
+                  maxLength={60}
+                  placeholder="Ex.: Lavanderia"
+                />
+              </Field>
+              <Field label="Categoria">
+                <input
+                  className="field"
+                  value={categoria}
+                  onChange={(e) => setCategoria(e.target.value)}
+                  maxLength={40}
+                  placeholder="Ex.: Bebidas"
+                />
+              </Field>
+            </div>
+          )}
+          {selectedProduct && selectedProduct.estoque_atual <= selectedProduct.estoque_minimo && (
+            <p className="mt-2 rounded-lg bg-brick-bg px-3 py-2 text-sm text-brick">
+              Atenção: estoque baixo para este produto.
+            </p>
+          )}
+          <div className="mt-2 grid grid-cols-[1fr_1fr_auto] items-end gap-3">
+            <Field label="Quantidade">
+              <input type="number" min={1} className="field" value={qtd} onChange={(e) => setQtd(Number(e.target.value))} />
+            </Field>
+            <Field label="Valor unitário">
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                className="field"
+                value={valor}
+                onChange={(e) => setValor(Number(e.target.value))}
+              />
+            </Field>
+            <button type="button" onClick={addItem} className="btn-ghost mb-0.5 flex items-center gap-1.5">
+              <Plus className="h-4 w-4" /> Adicionar
+            </button>
+          </div>
+
+          {itens.length > 0 && (
+            <ul className="mt-3 divide-y divide-border/60 text-sm">
+              {itens.map((i, idx) => (
+                <li key={`${i.item}-${idx}`} className="flex items-center justify-between py-2">
+                  <span>
+                    {i.qtd}× {i.item}
+                    <span className="ml-1 text-xs text-muted-foreground">{i.categoria}</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <strong>{fmtBRL(i.qtd * i.valor_unit)}</strong>
+                    <button
+                      type="button"
+                      className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground"
+                      onClick={() => setItens((prev) => prev.filter((_, k) => k !== idx))}
+                      title="Remover item"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <Field label="Pagamento">
           <select className="field" value={pagamento} onChange={(e) => setPagamento(e.target.value)}>
             {PAYMENT_METHODS.map((m) => (
@@ -386,15 +489,15 @@ function SaleForm({
           </select>
         </Field>
         <div className="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
-          <span className="text-sm text-muted-foreground">Total</span>
-          <span className="font-serif text-lg font-bold">{fmtBRL(total)}</span>
+          <span className="text-sm text-muted-foreground">Total da comanda</span>
+          <span className="font-serif text-lg font-bold">{fmtBRL(totalComanda)}</span>
         </div>
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className="btn-ghost">
             Cancelar
           </button>
-          <button type="submit" className="btn-primary">
-            Salvar
+          <button type="submit" className="btn-primary" disabled={saving}>
+            {saving ? "Salvando..." : "Salvar comanda"}
           </button>
         </div>
       </form>
