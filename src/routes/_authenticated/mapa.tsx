@@ -73,7 +73,7 @@ function Mapa() {
     reservations.forEach((r) => {
       if (r.status !== "cancelado") m.set(r.quarto, (m.get(r.quarto) ?? 0) + Number(r.valor_total));
     });
-    sales.forEach((s) => m.set(s.quarto, (m.get(s.quarto) ?? 0) + Number(s.total)));
+    sales.forEach((s) => { if (s.quarto == null) return; m.set(s.quarto, (m.get(s.quarto) ?? 0) + Number(s.total)); });
     return m;
   }, [reservations, sales]);
 
