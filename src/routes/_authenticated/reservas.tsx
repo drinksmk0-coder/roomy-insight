@@ -44,13 +44,17 @@ function Reservas() {
   const [editing, setEditing] = useState<Reservation | null>(null);
   const [moving, setMoving] = useState<Reservation | null>(null);
   const [filter, setFilter] = useState("ativas");
+  const [dateFilter, setDateFilter] = useState("");
 
   const filtered = useMemo(() => {
-    if (filter === "ativas")
-      return reservations.filter((r) => !["finalizado", "cancelado"].includes(r.status));
-    if (filter === "todas") return reservations;
-    return reservations.filter((r) => r.status === filter);
-  }, [reservations, filter]);
+    let list = reservations;
+    if (filter === "ativas") list = list.filter((r) => !["finalizado", "cancelado"].includes(r.status));
+    else if (filter !== "todas") list = list.filter((r) => r.status === filter);
+    // Estadia que cobre a data escolhida: checkin <= data <= checkout.
+    if (dateFilter) list = list.filter((r) => r.checkin <= dateFilter && r.checkout >= dateFilter);
+    return list;
+  }, [reservations, filter, dateFilter]);
+
 
   function exportCSV() {
     const rows: (string | number | null)[][] = [
