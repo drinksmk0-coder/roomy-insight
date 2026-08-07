@@ -474,11 +474,14 @@ export type Database = {
           company_id: string
           created_at: string
           created_by: string | null
+          custo_unitario: number
           estoque_atual: number
           estoque_minimo: number
+          estoque_total_recebido: number
           id: string
           nome: string
           preco: number
+          unidade: string
           updated_at: string
         }
         Insert: {
@@ -487,11 +490,14 @@ export type Database = {
           company_id: string
           created_at?: string
           created_by?: string | null
+          custo_unitario?: number
           estoque_atual?: number
           estoque_minimo?: number
+          estoque_total_recebido?: number
           id?: string
           nome: string
           preco?: number
+          unidade?: string
           updated_at?: string
         }
         Update: {
@@ -500,11 +506,14 @@ export type Database = {
           company_id?: string
           created_at?: string
           created_by?: string | null
+          custo_unitario?: number
           estoque_atual?: number
           estoque_minimo?: number
+          estoque_total_recebido?: number
           id?: string
           nome?: string
           preco?: number
+          unidade?: string
           updated_at?: string
         }
         Relationships: [
@@ -685,6 +694,9 @@ export type Database = {
           cliente_id: string | null
           comanda_id: string | null
           company_id: string
+          compra_id: string | null
+          comprador_nome: string | null
+          comprador_tipo: string | null
           consumidor: string | null
           created_at: string
           created_by: string | null
@@ -696,8 +708,10 @@ export type Database = {
           qtd: number
           quarto: number | null
           reserva_id: string | null
+          status: string
           tipo: string
           total: number
+          valor_pago: number
           valor_unit: number
         }
         Insert: {
@@ -705,6 +719,9 @@ export type Database = {
           cliente_id?: string | null
           comanda_id?: string | null
           company_id: string
+          compra_id?: string | null
+          comprador_nome?: string | null
+          comprador_tipo?: string | null
           consumidor?: string | null
           created_at?: string
           created_by?: string | null
@@ -716,8 +733,10 @@ export type Database = {
           qtd?: number
           quarto?: number | null
           reserva_id?: string | null
+          status?: string
           tipo?: string
           total?: number
+          valor_pago?: number
           valor_unit?: number
         }
         Update: {
@@ -725,6 +744,9 @@ export type Database = {
           cliente_id?: string | null
           comanda_id?: string | null
           company_id?: string
+          compra_id?: string | null
+          comprador_nome?: string | null
+          comprador_tipo?: string | null
           consumidor?: string | null
           created_at?: string
           created_by?: string | null
@@ -736,8 +758,10 @@ export type Database = {
           qtd?: number
           quarto?: number | null
           reserva_id?: string | null
+          status?: string
           tipo?: string
           total?: number
+          valor_pago?: number
           valor_unit?: number
         }
         Relationships: [
@@ -775,6 +799,63 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["company_id", "numero"]
+          },
+        ]
+      }
+      stock_movements: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          custo_unitario: number | null
+          estoque_anterior: number
+          estoque_posterior: number
+          id: string
+          motivo: string | null
+          produto_id: string
+          quantidade: number
+          tipo: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          custo_unitario?: number | null
+          estoque_anterior: number
+          estoque_posterior: number
+          id?: string
+          motivo?: string | null
+          produto_id: string
+          quantidade: number
+          tipo: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          custo_unitario?: number | null
+          estoque_anterior?: number
+          estoque_posterior?: number
+          id?: string
+          motivo?: string | null
+          produto_id?: string
+          quantidade?: number
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -881,6 +962,25 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      register_stock_count: {
+        Args: {
+          _company_id: string
+          _counted_quantity: number
+          _product_id: string
+          _reason: string
+        }
+        Returns: undefined
+      }
+      register_stock_restock: {
+        Args: {
+          _company_id: string
+          _product_id: string
+          _quantity: number
+          _reason: string
+          _unit_cost: number
+        }
+        Returns: undefined
+      }
       reservation_has_overlap: {
         Args: {
           _checkin: string
